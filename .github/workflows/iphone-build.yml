@@ -1,0 +1,29 @@
+name: iPhone-Build zum Ausprobieren
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+jobs:
+  build_iphone_zip:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: numismatik-app/package-lock.json
+      - name: Install dependencies
+        working-directory: numismatik-app
+        run: npm ci
+      - name: Build iPhone package
+        working-directory: numismatik-app
+        run: bash scripts/package-iphone.sh "$GITHUB_WORKSPACE/Numismatik-iPhone.zip"
+      - name: Upload iPhone zip
+        uses: actions/upload-artifact@v4
+        with:
+          name: Numismatik-iPhone
+          path: Numismatik-iPhone.zip
+          if-no-files-found: error
