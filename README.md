@@ -25,6 +25,10 @@ npm run dev
 - `/datenschutz` Datenschutzerklärung
 - `/support` Support-Seite für den App Store (`kontakt@numismatik.app`)
 
+## Auf dem iPhone ansehen
+
+Die Datei `Numismatik-iPhone.zip` enthält das fertige Xcode-Projekt. Auf einem Mac entpacken, in Xcode `ios/App/App.xcodeproj` öffnen, das eigene Apple-Team wählen und mit dem Play-Knopf auf das angeschlossene iPhone spielen. Die Schritte stehen auch in `ANLEITUNG.txt` in der Zip.
+
 ## Noch offen
 
 Die Bundle-ID der iPhone-App ist weiterhin `com.alaniselin.numisma.test`. Sie darf erst auf `com.alaniselin.numisma` wechseln, wenn diese ID in App Store Connect angelegt ist. Ein echter Testkauf und das Löschen eines Cloud-Kontos brauchen das Apple- bzw. Firebase-Konto.
