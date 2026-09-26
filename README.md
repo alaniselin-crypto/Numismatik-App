@@ -25,6 +25,12 @@ npm run dev
 - `/datenschutz` Datenschutzerklärung
 - `/support` Support-Seite für den App Store (`kontakt@numismatik.app`)
 
+## Automatisches Veröffentlichen
+
+Bei jedem Push auf `main` baut `.github/workflows/firebase-deploy.yml` die App und spielt sie auf Firebase Hosting aus (`gen-lang-client-0221041376`, Kanal `live`).
+
+Im GitHub-Repository unter Settings → Secrets and variables → Actions muss das Geheimnis `FIREBASE_SERVICE_ACCOUNT` liegen: der JSON-Schlüssel eines Firebase-Dienstkontos mit der Rolle Firebase Hosting Admin.
+
 ## Auf dem iPhone ansehen
 
 Die Datei `Numismatik-iPhone.zip` enthält das fertige Xcode-Projekt. Auf einem Mac entpacken, in Xcode `ios/App/App.xcodeproj` öffnen, das eigene Apple-Team wählen und mit dem Play-Knopf auf das angeschlossene iPhone spielen. Die Schritte stehen auch in `ANLEITUNG.txt` in der Zip.
