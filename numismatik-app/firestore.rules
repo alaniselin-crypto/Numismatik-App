@@ -1,0 +1,65 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function isOwner(uid) {
+      return request.auth != null && request.auth.uid == uid;
+    }
+
+    function isValidCoin() {
+      return !('userId' in request.resource.data);
+    }
+
+    function isValidTombstone(coinId) {
+      return request.resource.data.keys().hasOnly(['coinId', 'deletedAt'])
+        && request.resource.data.keys().hasAll(['coinId', 'deletedAt'])
+        && request.resource.data.coinId is string
+        && request.resource.data.coinId.size() > 0
+        && request.resource.data.coinId == coinId
+        && request.resource.data.deletedAt is timestamp;
+    }
+
+    function isValidAppSettings(uid) {
+      return request.resource.data.keys().hasOnly(['folders', 'platforms', 'lastIssuedCatalogNumber'])
+        && (!('folders' in request.resource.data) || request.resource.data.folders is list)
+        && (!('platforms' in request.resource.data) || request.resource.data.platforms is list)
+        && (!('lastIssuedCatalogNumber' in request.resource.data)
+          || (request.resource.data.lastIssuedCatalogNumber is int
+            && request.resource.data.lastIssuedCatalogNumber >= 0))
+        && (!exists(/databases/$(database)/documents/users/$(uid)/settings/app)
+          || !('lastIssuedCatalogNumber' in resource.data)
+          || (('lastIssuedCatalogNumber' in request.resource.data)
+            && request.resource.data.lastIssuedCatalogNumber >= resource.data.lastIssuedCatalogNumber));
+    }
+
+    match /users/{uid}/coins/{coinId} {
+      allow read, delete: if isOwner(uid);
+      allow create, update: if isOwner(uid) && isValidCoin();
+    }
+
+    match /users/{uid}/coinTombstones/{coinId} {
+      allow read: if isOwner(uid);
+      allow create, update: if isOwner(uid) && isValidTombstone(coinId);
+      allow delete: if false;
+    }
+
+    match /users/{uid}/settings/{settingsId} {
+      allow read: if isOwner(uid) && settingsId == 'app';
+      allow delete: if false;
+      allow create, update: if isOwner(uid)
+        && settingsId == 'app'
+        && isValidAppSettings(uid);
+    }
+
+    match /coins/{coinId} {
+      allow read, write: if false;
+    }
+
+    match /userSettings/{uid} {
+      allow read, write: if false;
+    }
+
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
