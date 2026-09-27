@@ -83,6 +83,7 @@ import { PlatformManagerModal } from './components/PlatformManagerModal';
 import { ConfirmDeleteModal } from './components/ConfirmDeleteModal';
 import { ConfirmDuplicateModal } from './components/ConfirmDuplicateModal';
 import { AuthModal } from './components/AuthModal';
+import { LoginPage } from './components/LoginPage';
 import { AppInfoModal } from './components/AppInfoModal';
 import { HeroDownloadModal } from './components/HeroDownloadModal';
 import { isAdminUser, setLocalAdmin } from './utils/admin';
@@ -1215,6 +1216,16 @@ export default function App() {
 
   // Total Collection Valuation KPI
   const totalValuation = coins.reduce((acc, c) => acc + (c.currentValue || 0), 0);
+
+  if (loading) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-[#100c0b] text-amber-400">
+        <div className="h-8 w-8 animate-spin rounded-full border-2 border-amber-500/25 border-t-amber-400" aria-label="Anmeldung wird geladen" />
+      </div>
+    );
+  }
+
+  if (!user) return <LoginPage />;
 
   return (
     <div className="min-h-screen bg-[#1a1412] text-stone-100 flex flex-col font-sans selection:bg-amber-500/30 selection:text-amber-200 overflow-x-hidden max-w-full w-full">

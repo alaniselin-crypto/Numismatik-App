@@ -40,6 +40,18 @@ test('signing out clears the coins on screen', () => {
   assert.match(helper, /coins: \[\]/);
 });
 
+test('signed-out users see only the dedicated login page', () => {
+  const app = source('src/App.tsx');
+  const login = source('src/components/LoginPage.tsx');
+  const gate = app.indexOf('if (!user) return <LoginPage />');
+  const application = app.indexOf('<Header');
+  assert.ok(gate >= 0 && application > gate, 'The login gate must render before the application');
+  assert.match(login, /function GoogleIcon/);
+  assert.match(login, /Mit Google anmelden/);
+  assert.match(login, /Mit E-Mail anmelden/);
+  assert.ok(login.indexOf('Mit Google anmelden') < login.indexOf('<form'), 'Google must appear above the email form');
+});
+
 test('phone layout keeps charts and the coin list readable', () => {
   const css = source('src/index.css');
   assert.match(css, /svg:not\(\.recharts-surface\)/);
