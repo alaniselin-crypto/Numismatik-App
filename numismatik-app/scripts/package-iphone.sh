@@ -41,9 +41,9 @@ cat > "$STAGE/ANLEITUNG.txt" << 'EOF'
 Numismatik auf dem iPhone öffnen
 =================================
 
-Das ist Build 40. Google, Druck/PDF und Diagramme bleiben geschützt.
-Neu sind die größere Überschrift sowie die erweiterte KI-Erkennung für
-Seltenheit, Erhaltung, Verkaufswert, Material und die Korrektur FR zu CHF.
+Das ist Build 41. Ohne Anmeldung bleibt die Sammlung vollständig verborgen.
+Die neue Startseite bietet Google-Anmeldung sowie E-Mail/Passwort-Anmeldung.
+Google, Druck/PDF, Diagramme und die erweiterte KI-Erkennung bleiben geschützt.
 
 Den alten Xcode-Ordner nicht noch einmal archivieren. Der erzeugt wieder
 die alte App.
@@ -63,7 +63,7 @@ die alte App.
 5. Menü Product → Archive.
    Danach Distribute App → App Store Connect → Upload.
 
-6. In App Store Connect unter TestFlight auf Build 1.0 (40) warten.
+6. In App Store Connect unter TestFlight auf Build 1.0 (41) warten.
    Status zuerst «Wird verarbeitet», dann «Abgeschlossen».
    Danach in der TestFlight-App auf dem iPhone auf Aktualisieren tippen.
 
