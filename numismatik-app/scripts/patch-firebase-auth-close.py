@@ -40,11 +40,7 @@ AUTH_NEW = """    private var phoneAuthProviderHandler: PhoneAuthProviderHandler
         self.plugin = plugin
         self.config = config
         super.init()
-        if FirebaseApp.app() == nil {
-            guard FirebaseOptions.defaultOptions() != nil else {
-                CAPLog.print("[FirebaseAuthentication] Firebase was not configured: GoogleService-Info.plist is missing from the app bundle.")
-                return
-            }
+        if FirebaseApp.app() == nil, FirebaseOptions.defaultOptions() != nil {
             FirebaseApp.configure()
         }
         self.initAuthProviderHandlers(config: config)
@@ -54,6 +50,64 @@ AUTH_NEW = """    private var phoneAuthProviderHandler: PhoneAuthProviderHandler
         idTokenListenerHandle = Auth.auth().addIDTokenDidChangeListener { [weak self] _, _ in
             self?.plugin.handleIdTokenChange()
         }
+"""
+
+EARLY_RETURN = """        if FirebaseApp.app() == nil {
+            guard FirebaseOptions.defaultOptions() != nil else {
+                CAPLog.print("[FirebaseAuthentication] Firebase was not configured: GoogleService-Info.plist is missing from the app bundle.")
+                return
+            }
+            FirebaseApp.configure()
+        }
+"""
+
+EARLY_RETURN_FIXED = """        if FirebaseApp.app() == nil, FirebaseOptions.defaultOptions() != nil {
+            FirebaseApp.configure()
+        }
+"""
+
+CONFIG_OLD = """public struct FirebaseAuthenticationConfig {
+    var skipNativeAuth = false
+    var providers = [String]()
+    var authDomain: String?
+}
+"""
+
+CONFIG_NEW = """public struct FirebaseAuthenticationConfig {
+    var skipNativeAuth = false
+    var providers = [String]()
+    var authDomain: String?
+    var googleClientId: String?
+}
+"""
+
+PROVIDERS_OLD = """        if let providers = getConfig().getArray("providers") as? [String] {
+            config.providers = providers
+        }
+"""
+
+PROVIDERS_NEW = """        if let providers = getConfig().getArray("providers") {
+            config.providers = providers.compactMap { $0 as? String }
+        }
+        config.authDomain = getConfig().getString("authDomain")
+        config.googleClientId = getConfig().getString("googleClientId")
+"""
+
+GOOGLE_OLD = """        guard let clientId = FirebaseApp.app()?.options.clientID else { return }
+        let config = GIDConfiguration(clientID: clientId, serverClientID: clientId)
+"""
+
+GOOGLE_NEW = """        let clientId = FirebaseApp.app()?.options.clientID ?? self.pluginImplementation.getConfig().googleClientId
+        guard let clientId else {
+            let message = "Google-Anmeldung ist auf diesem iPhone nicht eingerichtet."
+            if isLink == true {
+                pluginImplementation.handleFailedLink(message: message, error: nil)
+            } else {
+                pluginImplementation.handleFailedSignIn(message: message, error: nil)
+            }
+            return
+        }
+        let config = GIDConfiguration(clientID: clientId, serverClientID: clientId)
 """
 
 DEINIT_BLOCK = """
@@ -128,6 +182,12 @@ def main() -> None:
     if not AUTH.exists() or not BRIDGE.exists():
         raise SystemExit("Firebase Authentication iOS plugin was not installed")
     replace_once(AUTH, AUTH_OLD, AUTH_NEW, "listener handles")
+    replace_once(AUTH, EARLY_RETURN, EARLY_RETURN_FIXED, "google startup")
+    config_path = PLUGIN / "FirebaseAuthenticationConfig.swift"
+    google_path = PLUGIN / "Handlers" / "GoogleAuthProviderHandler.swift"
+    replace_once(config_path, CONFIG_OLD, CONFIG_NEW, "google client id")
+    replace_once(BRIDGE, PROVIDERS_OLD, PROVIDERS_NEW, "provider list")
+    replace_once(google_path, GOOGLE_OLD, GOOGLE_NEW, "google client fallback")
     auth_text = AUTH.read_text()
     if DEINIT_BLOCK in auth_text:
         AUTH.write_text(auth_text.replace(DEINIT_BLOCK, "\n", 1))

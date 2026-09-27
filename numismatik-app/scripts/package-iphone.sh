@@ -37,9 +37,9 @@ cat > "$STAGE/ANLEITUNG.txt" << 'EOF'
 Numismatik auf dem iPhone öffnen
 =================================
 
-Das ist Build 31. Build 30 nicht mehr öffnen: der stürzt sofort ab.
-Build 31 enthält dieselben Korrekturen für Diagramme, Listenansicht,
-das Schild «Avers» und die Anmeldung, startet aber ohne Abmeldung beim Öffnen.
+Das ist Build 32. Build 30 nicht öffnen: der stürzt sofort ab.
+Build 31 nicht noch einmal archivieren. Build 32 startet, zeigt die
+Diagramme lesbar und schaltet die Google-Anmeldung ein.
 
 Den alten Xcode-Ordner nicht noch einmal archivieren. Der erzeugt wieder
 die alte App.
@@ -59,7 +59,7 @@ die alte App.
 5. Menü Product → Archive.
    Danach Distribute App → App Store Connect → Upload.
 
-6. In App Store Connect unter TestFlight auf Build 1.0 (31) warten.
+6. In App Store Connect unter TestFlight auf Build 1.0 (32) warten.
    Status zuerst «Wird verarbeitet», dann «Abgeschlossen».
    Danach in der TestFlight-App auf dem iPhone auf Aktualisieren tippen.
 

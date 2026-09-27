@@ -1,6 +1,7 @@
 import type { CapacitorConfig } from '@capacitor/cli';
+import firebaseConfig from './firebase-applet-config.json';
 
-const config: CapacitorConfig = {
+const config = {
   appId: 'com.alaniselin.numisma.test',
   appName: 'Numismatik',
   webDir: 'dist-ios',
@@ -10,7 +11,9 @@ const config: CapacitorConfig = {
   plugins: {
     FirebaseAuthentication: {
       skipNativeAuth: true,
-      providers: ['google.com'],
+      providers: ['apple.com', 'google.com'],
+      authDomain: firebaseConfig.authDomain,
+      googleClientId: firebaseConfig.oAuthClientId,
     },
   },
   experimental: {
@@ -24,6 +27,6 @@ const config: CapacitorConfig = {
       },
     },
   },
-};
+} as CapacitorConfig;
 
 export default config;

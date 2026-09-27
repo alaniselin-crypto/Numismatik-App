@@ -43,11 +43,11 @@ export const StatisticsView: React.FC<StatisticsViewProps> = ({ coins }) => {
   const eraCounts: Record<string, number> = {};
   coins.forEach(c => {
     let era = 'Modern (2000+)';
-    if (c.year < 500) era = 'Antike (vor 500 n.Chr.)';
-    else if (c.year < 1500) era = 'Mittelalter (500-1500)';
-    else if (c.year < 1800) era = 'Neuzeit (1500-1800)';
-    else if (c.year < 1900) era = '19. Jahrhundert';
-    else if (c.year < 2000) era = '20. Jahrhundert';
+    if (c.year < 500) era = 'Antike';
+    else if (c.year < 1500) era = 'Mittelalter';
+    else if (c.year < 1800) era = 'Neuzeit';
+    else if (c.year < 1900) era = '19. Jh.';
+    else if (c.year < 2000) era = '20. Jh.';
 
     eraCounts[era] = (eraCounts[era] || 0) + 1;
   });
@@ -142,7 +142,7 @@ export const StatisticsView: React.FC<StatisticsViewProps> = ({ coins }) => {
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={eraData} layout="vertical">
                 <XAxis type="number" stroke="#64748b" fontSize={11} allowDecimals={false} />
-                <YAxis dataKey="name" type="category" stroke="#64748b" fontSize={10} width={130} />
+                <YAxis dataKey="name" type="category" stroke="#64748b" fontSize={12} width={96} tickLine={false} />
                 <Tooltip
                   contentStyle={{ backgroundColor: '#121318', borderColor: '#334155', borderRadius: '12px', color: '#f8fafc' }}
                 />
