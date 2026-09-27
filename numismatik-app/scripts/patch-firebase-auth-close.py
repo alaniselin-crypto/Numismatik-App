@@ -29,6 +29,9 @@ AUTH_OLD = """    private var phoneAuthProviderHandler: PhoneAuthProviderHandler
         _ = Auth.auth().addIDTokenDidChangeListener {_, _ in
             self.plugin.handleIdTokenChange()
         }
+        if let authDomain = config.authDomain {
+            Auth.auth().customAuthDomain = authDomain
+        }
 """
 
 AUTH_NEW = """    private var phoneAuthProviderHandler: PhoneAuthProviderHandler?
@@ -44,11 +47,16 @@ AUTH_NEW = """    private var phoneAuthProviderHandler: PhoneAuthProviderHandler
             FirebaseApp.configure()
         }
         self.initAuthProviderHandlers(config: config)
-        authStateListenerHandle = Auth.auth().addStateDidChangeListener { [weak self] _, _ in
-            self?.plugin.handleAuthStateChange()
-        }
-        idTokenListenerHandle = Auth.auth().addIDTokenDidChangeListener { [weak self] _, _ in
-            self?.plugin.handleIdTokenChange()
+        if FirebaseApp.app() != nil {
+            authStateListenerHandle = Auth.auth().addStateDidChangeListener { [weak self] _, _ in
+                self?.plugin.handleAuthStateChange()
+            }
+            idTokenListenerHandle = Auth.auth().addIDTokenDidChangeListener { [weak self] _, _ in
+                self?.plugin.handleIdTokenChange()
+            }
+            if let authDomain = config.authDomain {
+                Auth.auth().customAuthDomain = authDomain
+            }
         }
 """
 

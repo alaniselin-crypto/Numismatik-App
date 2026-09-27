@@ -85,6 +85,7 @@ test('the iOS auth patch does not sign out or tear Firebase down', () => {
   const patch = source('scripts/patch-firebase-auth-close.py');
   assert.match(patch, /providers\.compactMap \{ \$0 as\? String \}/);
   assert.match(patch, /googleClientId/);
+  assert.match(patch, /if FirebaseApp\.app\(\) != nil/);
   assert.match(patch, /deinit already absent/);
   assert.equal(patch.includes('DEINIT_INSERT'), false);
   assert.equal(patch.includes('FirebaseAuthentication.signOut'), false);
