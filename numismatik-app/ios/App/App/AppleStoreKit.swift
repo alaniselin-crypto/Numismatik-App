@@ -71,7 +71,7 @@ public class AppleStoreKit: CAPPlugin, CAPBridgedPlugin {
                     switch verification {
                     case .verified(let transaction):
                         call.resolve([
-                            "signedTransaction": transaction.jwsRepresentation,
+                            "signedTransaction": verification.jwsRepresentation,
                             "transactionId": String(transaction.id),
                         ])
                     case .unverified:
@@ -92,7 +92,7 @@ public class AppleStoreKit: CAPPlugin, CAPBridgedPlugin {
 
     @objc func finish(_ call: CAPPluginCall) {
         guard let transactionIdString = call.getString("transactionId"),
-              let transactionId = UInt64(transactionIdString) else {
+              UInt64(transactionIdString) != nil else {
             call.reject("Invalid transaction id", "storekit/invalid-transaction-id")
             return
         }
@@ -117,8 +117,8 @@ public class AppleStoreKit: CAPPlugin, CAPBridgedPlugin {
         Task {
             do {
                 try await AppStore.sync()
-                if let entitlement = await Self.latestEntitlement() {
-                    call.resolve(["signedTransaction": entitlement.jwsRepresentation])
+                if let signedTransaction = await Self.latestEntitlementJws() {
+                    call.resolve(["signedTransaction": signedTransaction])
                 } else {
                     call.reject("No previous purchase found", "storekit/no-entitlement")
                 }
@@ -128,20 +128,17 @@ public class AppleStoreKit: CAPPlugin, CAPBridgedPlugin {
         }
     }
 
-    private static func latestEntitlement() async -> Transaction? {
-        var latest: Transaction?
+    private static func latestEntitlementJws() async -> String? {
+        var latest: (date: Date, jws: String)?
         for await result in Transaction.currentEntitlements {
-            if case .verified(let transaction) = result,
-               productIds.contains(transaction.productID) {
-                if let existing = latest {
-                    if transaction.purchaseDate > existing.purchaseDate {
-                        latest = transaction
-                    }
-                } else {
-                    latest = transaction
-                }
+            guard case .verified(let transaction) = result,
+                  productIds.contains(transaction.productID) else {
+                continue
+            }
+            if latest == nil || transaction.purchaseDate > latest!.date {
+                latest = (transaction.purchaseDate, result.jwsRepresentation)
             }
         }
-        return latest
+        return latest?.jws
     }
 }
