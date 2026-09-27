@@ -14,6 +14,7 @@ const USER_PLATFORMS_STORAGE_KEY = 'coin_collection_custom_platforms_v2';
 const USER_TOMBSTONES_STORAGE_KEY = 'coin_collection_tombstones_v1';
 const USER_PENDING_MUTATIONS_STORAGE_KEY = 'coin_collection_pending_mutations_v1';
 const LAST_ISSUED_CATALOG_NUMBER_STORAGE_KEY = 'coin_collection_last_issued_catalog_number_v1';
+const LAST_SIGNED_IN_UID_KEY = 'numismatik_last_signed_in_uid';
 
 export interface LocalCoinTombstone {
   coinId: string;
@@ -108,6 +109,16 @@ export function isPendingMutationPayloadValid(mutation: PendingMutation): boolea
 
 function createPendingMutationId(): string {
   return `mutation-${Date.now()}-${Math.random().toString(36).slice(2, 9)}`;
+}
+
+export function rememberSignedInUid(uid: string): void {
+  if (!uid) return;
+  localStorage.setItem(LAST_SIGNED_IN_UID_KEY, uid);
+}
+
+export function loadRememberedSignedInUid(): string | null {
+  const uid = localStorage.getItem(LAST_SIGNED_IN_UID_KEY);
+  return uid && uid.length > 0 ? uid : null;
 }
 
 export function loadUserCoinsFromStorage(uid: string): Coin[] {

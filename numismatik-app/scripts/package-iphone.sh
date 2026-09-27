@@ -5,6 +5,8 @@ set -euo pipefail
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$ROOT"
 
+python3 scripts/patch-firebase-auth-close.py
+
 npm run build:ios
 npx cap sync ios
 

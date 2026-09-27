@@ -20,6 +20,8 @@ import {
   getCoinTitle,
   loadUserCoinsFromStorage,
   saveUserCoinsToStorage,
+  rememberSignedInUid,
+  loadRememberedSignedInUid,
   loadUserFoldersFromStorage,
   saveUserFoldersToStorage,
   loadUserPlatformsFromStorage,
@@ -257,6 +259,7 @@ export default function App() {
 
     if (userUid) {
       signedInUidRef.current = userUid;
+      rememberSignedInUid(userUid);
       let cancelled = false;
       const localCoins = ensureCoinSKUs(loadUserCoinsFromStorage(userUid));
       const localFolders = loadUserFoldersFromStorage(userUid);
@@ -360,11 +363,19 @@ export default function App() {
           : { coins: [], folders: [], platforms: [] },
         device: (() => {
           const savedCoins = loadSavedDeviceCoins();
-          if (!savedCoins) return null;
+          if (savedCoins) {
+            return {
+              coins: savedCoins,
+              folders: loadSavedDeviceFolders() ?? [],
+              platforms: loadSavedDevicePlatforms() ?? [],
+            };
+          }
+          const rememberedUid = loadRememberedSignedInUid();
+          if (!rememberedUid) return null;
           return {
-            coins: savedCoins,
-            folders: loadSavedDeviceFolders() ?? [],
-            platforms: loadSavedDevicePlatforms() ?? [],
+            coins: loadUserCoinsFromStorage(rememberedUid),
+            folders: loadUserFoldersFromStorage(rememberedUid),
+            platforms: loadUserPlatformsFromStorage(rememberedUid),
           };
         })(),
       });
