@@ -9,6 +9,7 @@ lerna-debug.log*
 
 node_modules
 dist
+dist-ios
 dist-ssr
 .output
 .vinxi
@@ -30,3 +31,4 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+**/CapApp-SPM/symlinks/
