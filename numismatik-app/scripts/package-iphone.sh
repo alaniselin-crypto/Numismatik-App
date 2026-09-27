@@ -41,8 +41,8 @@ cat > "$STAGE/ANLEITUNG.txt" << 'EOF'
 Numismatik auf dem iPhone öffnen
 =================================
 
-Das ist Build 38. Die Google-Anmeldung verwendet den offiziellen iOS-Client.
-Die gelben Druck/PDF-Knöpfe öffnen auf dem iPhone den nativen Druckdialog.
+Das ist Build 39. Google und die nativen Druck/PDF-Knöpfe bleiben unverändert.
+Die Diagramm-Legenden haben auf dem iPhone wieder ihre richtige Größe.
 
 Den alten Xcode-Ordner nicht noch einmal archivieren. Der erzeugt wieder
 die alte App.
@@ -62,7 +62,7 @@ die alte App.
 5. Menü Product → Archive.
    Danach Distribute App → App Store Connect → Upload.
 
-6. In App Store Connect unter TestFlight auf Build 1.0 (38) warten.
+6. In App Store Connect unter TestFlight auf Build 1.0 (39) warten.
    Status zuerst «Wird verarbeitet», dann «Abgeschlossen».
    Danach in der TestFlight-App auf dem iPhone auf Aktualisieren tippen.
 

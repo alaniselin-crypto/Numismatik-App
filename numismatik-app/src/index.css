@@ -154,10 +154,29 @@ img, video, canvas, svg:not(.recharts-surface) {
   word-break: normal !important;
 }
 
-.recharts-surface {
+.recharts-wrapper > .recharts-surface {
   max-width: 100% !important;
   width: 100% !important;
   height: 100% !important;
+}
+
+.recharts-default-legend {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.25rem 0.75rem;
+}
+
+.recharts-legend-item {
+  display: inline-flex !important;
+  align-items: center;
+  margin-right: 0 !important;
+}
+
+.recharts-legend-item .recharts-surface {
+  width: 12px !important;
+  height: 12px !important;
+  flex: 0 0 12px;
 }
 
 .recharts-legend-item-text {

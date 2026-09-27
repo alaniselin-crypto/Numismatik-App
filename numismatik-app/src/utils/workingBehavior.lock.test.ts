@@ -43,7 +43,8 @@ test('signing out clears the coins on screen', () => {
 test('phone layout keeps charts and the coin list readable', () => {
   const css = source('src/index.css');
   assert.match(css, /svg:not\(\.recharts-surface\)/);
-  assert.match(css, /\.recharts-surface \{[\s\S]*height: 100% !important;/);
+  assert.match(css, /\.recharts-wrapper > \.recharts-surface \{[\s\S]*height: 100% !important;/);
+  assert.match(css, /\.recharts-legend-item \.recharts-surface \{[\s\S]*width: 12px !important;[\s\S]*height: 12px !important;/);
   assert.match(css, /\.recharts-wrapper \* \{[\s\S]*overflow-wrap: normal !important;/);
   assert.equal(css.includes(':not(.recharts-wrapper)'), true);
   assert.match(css, /#root main \{[\s\S]*overflow-x: clip;/);
