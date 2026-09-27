@@ -39,8 +39,8 @@ cat > "$STAGE/ANLEITUNG.txt" << 'EOF'
 Numismatik auf dem iPhone öffnen
 =================================
 
-Das ist Build 33. Build 30 und Build 32 nicht öffnen: die stürzen sofort ab.
-Build 33 startet, ohne Firebase aufzurufen, solange es noch nicht eingerichtet ist.
+Das ist Build 34. Ohne Anmeldung ist die Sammlung leer.
+Die Münzen kommen wieder, sobald du dich mit E-Mail und Passwort anmeldest.
 
 Den alten Xcode-Ordner nicht noch einmal archivieren. Der erzeugt wieder
 die alte App.
@@ -60,7 +60,7 @@ die alte App.
 5. Menü Product → Archive.
    Danach Distribute App → App Store Connect → Upload.
 
-6. In App Store Connect unter TestFlight auf Build 1.0 (33) warten.
+6. In App Store Connect unter TestFlight auf Build 1.0 (34) warten.
    Status zuerst «Wird verarbeitet», dann «Abgeschlossen».
    Danach in der TestFlight-App auf dem iPhone auf Aktualisieren tippen.
 

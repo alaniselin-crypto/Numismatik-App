@@ -32,10 +32,12 @@ test('native auth starts in memory and falls back if that fails', () => {
   assert.match(firebase, /catch \(error\) \{[\s\S]*return getAuth\(app\)/);
 });
 
-test('signing out keeps the collection that is already on the device', () => {
+test('signing out clears the coins on screen', () => {
   const app = source('src/App.tsx');
+  const helper = source('src/utils/signedOutCollection.ts');
   assert.match(app, /collectionToKeepOnSignOut/);
-  assert.equal(app.includes('setCoins([])'), false);
+  assert.match(helper, /saveOnDevice: false/);
+  assert.match(helper, /coins: \[\]/);
 });
 
 test('phone layout keeps charts and the coin list readable', () => {
