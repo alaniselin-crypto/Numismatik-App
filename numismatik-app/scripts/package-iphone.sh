@@ -7,6 +7,8 @@ cd "$ROOT"
 
 python3 scripts/patch-firebase-auth-close.py
 
+node --import tsx --test src/utils/workingBehavior.lock.test.ts src/utils/signedOutCollection.test.ts
+
 npm run build:ios
 npx cap sync ios
 
