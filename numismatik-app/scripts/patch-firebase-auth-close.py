@@ -131,6 +131,24 @@ GOOGLE_NEW = """        let clientId = FirebaseApp.app()?.options.clientID ?? se
         let config = GIDConfiguration(clientID: clientId)
 """
 
+SIGN_OUT_OLD = """    @objc func signOut(_ call: CAPPluginCall) {
+        do {
+            try Auth.auth().signOut()
+            googleAuthProviderHandler?.signOut()
+            facebookAuthProviderHandler?.signOut()
+            call.resolve()
+"""
+
+SIGN_OUT_NEW = """    @objc func signOut(_ call: CAPPluginCall) {
+        do {
+            if FirebaseApp.app() != nil {
+                try Auth.auth().signOut()
+            }
+            googleAuthProviderHandler?.signOut()
+            facebookAuthProviderHandler?.signOut()
+            call.resolve()
+"""
+
 DEINIT_BLOCK = """
     deinit {
         if let authStateListenerHandle {
@@ -220,6 +238,7 @@ def main() -> None:
     replace_once(config_path, CONFIG_OLD, CONFIG_NEW, "google client id")
     replace_once(BRIDGE, PROVIDERS_OLD, PROVIDERS_NEW, "provider list")
     replace_google_client(google_path)
+    replace_once(AUTH, SIGN_OUT_OLD, SIGN_OUT_NEW, "safe native sign-out")
     auth_text = AUTH.read_text()
     if DEINIT_BLOCK in auth_text:
         AUTH.write_text(auth_text.replace(DEINIT_BLOCK, "\n", 1))

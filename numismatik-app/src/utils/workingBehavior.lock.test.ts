@@ -137,6 +137,7 @@ test('the iOS auth patch does not sign out or tear Firebase down', () => {
   assert.match(patch, /googleClientId/);
   assert.match(patch, /GIDConfiguration\(clientID: clientId\)/);
   assert.match(patch, /if FirebaseApp\.app\(\) != nil/);
+  assert.match(patch, /SIGN_OUT_NEW = """[\s\S]*if FirebaseApp\.app\(\) != nil \{[\s\S]*try Auth\.auth\(\)\.signOut\(\)/);
   assert.match(patch, /deinit already absent/);
   assert.equal(patch.includes('DEINIT_INSERT'), false);
   assert.equal(patch.includes('FirebaseAuthentication.signOut'), false);
