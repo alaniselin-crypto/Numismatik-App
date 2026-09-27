@@ -41,8 +41,9 @@ cat > "$STAGE/ANLEITUNG.txt" << 'EOF'
 Numismatik auf dem iPhone öffnen
 =================================
 
-Das ist Build 41. Ohne Anmeldung bleibt die Sammlung vollständig verborgen.
+Das ist Build 43. Ohne Anmeldung bleibt die Sammlung vollständig verborgen.
 Die neue Startseite bietet Google-Anmeldung sowie E-Mail/Passwort-Anmeldung.
+Die native Abmeldung ist gegen den bisherigen iPhone-Absturz abgesichert.
 Google, Druck/PDF, Diagramme und die erweiterte KI-Erkennung bleiben geschützt.
 
 Den alten Xcode-Ordner nicht noch einmal archivieren. Der erzeugt wieder
@@ -63,7 +64,7 @@ die alte App.
 5. Menü Product → Archive.
    Danach Distribute App → App Store Connect → Upload.
 
-6. In App Store Connect unter TestFlight auf Build 1.0 (41) warten.
+6. In App Store Connect unter TestFlight auf Build 1.0 (43) warten.
    Status zuerst «Wird verarbeitet», dann «Abgeschlossen».
    Danach in der TestFlight-App auf dem iPhone auf Aktualisieren tippen.
 
