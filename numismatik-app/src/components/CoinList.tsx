@@ -580,7 +580,7 @@ export const CoinList: React.FC<CoinListProps> = ({
           ) : (
             <div className="bg-[#241c18] border border-[#3e2e26] rounded-2xl overflow-hidden shadow-lg max-w-full">
               <div className="overflow-x-auto max-w-full">
-                <table className="w-full text-left border-collapse">
+                <table className="collection-table w-full text-left border-collapse">
                   <thead>
                     <tr className="bg-[#1a1412] border-b border-[#3e2e26] text-[11px] uppercase font-semibold text-stone-400">
                       <th className="py-3 px-3 w-8">★</th>

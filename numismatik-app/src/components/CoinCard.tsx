@@ -251,11 +251,6 @@ export const CoinCard: React.FC<CoinCardProps> = ({
                   <RefreshCw className="w-3 h-3" />
                 </button>
               )}
-              {currentDisplayImage && (
-                <span className="absolute bottom-0 left-1/2 -translate-x-1/2 bg-[#140f0d]/90 border border-[#3e2e25] text-[9px] px-1.5 py-0.2 rounded-full text-stone-200 font-mono pointer-events-none shadow-md">
-                  {showReverse && coin.reverseImageUrl ? 'Revers' : 'Avers'}
-                </span>
-              )}
             </div>
             {coin.mintMark && (
               <span className="absolute -bottom-1 -right-1 w-6 h-6 bg-[#1a1412] border border-amber-500/80 rounded-full flex items-center justify-center text-[10px] font-bold text-amber-400 z-10 shadow-md">
