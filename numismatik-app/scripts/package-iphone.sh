@@ -19,6 +19,7 @@ const config = JSON.parse(fs.readFileSync(path, "utf8"));
 const list = new Set(config.packageClassList ?? []);
 list.add("AppleStoreKitPlugin");
 list.add("GoogleDesktopSignInPlugin");
+list.add("NativePrintPlugin");
 config.packageClassList = [...list];
 fs.writeFileSync(path, JSON.stringify(config, null, "\t") + "\n");
 EOF
@@ -40,8 +41,8 @@ cat > "$STAGE/ANLEITUNG.txt" << 'EOF'
 Numismatik auf dem iPhone öffnen
 =================================
 
-Das ist Build 37. Die Google-Anmeldung verwendet den offiziellen iOS-Client
-und zeigt wieder die normale Google-Kontoauswahl.
+Das ist Build 38. Die Google-Anmeldung verwendet den offiziellen iOS-Client.
+Die gelben Druck/PDF-Knöpfe öffnen auf dem iPhone den nativen Druckdialog.
 
 Den alten Xcode-Ordner nicht noch einmal archivieren. Der erzeugt wieder
 die alte App.
@@ -61,7 +62,7 @@ die alte App.
 5. Menü Product → Archive.
    Danach Distribute App → App Store Connect → Upload.
 
-6. In App Store Connect unter TestFlight auf Build 1.0 (37) warten.
+6. In App Store Connect unter TestFlight auf Build 1.0 (38) warten.
    Status zuerst «Wird verarbeitet», dann «Abgeschlossen».
    Danach in der TestFlight-App auf dem iPhone auf Aktualisieren tippen.
 

@@ -1,8 +1,10 @@
-import React from 'react';
+import React, { useState } from 'react';
+import { Capacitor } from '@capacitor/core';
 import { X, Printer, ExternalLink, Coins, Banknote } from 'lucide-react';
 import { Coin } from '../types';
 import { formatCurrency } from '../utils/storage';
 import { getRarityOption } from '../data/rarities';
+import { NativePrint } from '../utils/nativePrint';
 
 interface PrintModalProps {
   isOpen: boolean;
@@ -65,6 +67,9 @@ function CatalogThumb({ coin }: { coin: Coin }) {
 }
 
 export const PrintModal: React.FC<PrintModalProps> = ({ isOpen, coins, onClose }) => {
+  const [isPrinting, setIsPrinting] = useState(false);
+  const [printError, setPrintError] = useState('');
+
   if (!isOpen) return null;
 
   const totalPositions = coins.length;
@@ -72,13 +77,8 @@ export const PrintModal: React.FC<PrintModalProps> = ({ isOpen, coins, onClose }
   const totalCost = coins.reduce((sum, c) => sum + ((c.purchasePrice || 0) * (c.quantity || 1)), 0);
   const totalValue = coins.reduce((sum, c) => sum + ((c.currentValue || 0) * (c.quantity || 1)), 0);
 
-  const handleOpenNewWindowAndPrint = () => {
-    const printWindow = window.open('', '_blank');
-    if (!printWindow) {
-      window.print();
-      return;
-    }
-
+  const handleOpenNewWindowAndPrint = async () => {
+    setPrintError('');
     const rowsHtml = coins.map((coin, index) => {
       const rarityOpt = getRarityOption(coin.rarity);
       const rarityLabel = rarityOpt ? rarityOpt.fullLabel : (coin.rarity || '-');
@@ -236,6 +236,28 @@ export const PrintModal: React.FC<PrintModalProps> = ({ isOpen, coins, onClose }
       </html>
     `;
 
+    if (Capacitor.getPlatform() === 'ios') {
+      setIsPrinting(true);
+      try {
+        await NativePrint.print({
+          html: htmlContent,
+          jobName: `Numismatik-Katalog ${new Date().toLocaleDateString('de-CH')}`,
+        });
+      } catch (error) {
+        console.error('Native print failed:', error);
+        setPrintError('Der iOS-Druckdialog konnte nicht geöffnet werden. Bitte versuchen Sie es erneut.');
+      } finally {
+        setIsPrinting(false);
+      }
+      return;
+    }
+
+    const printWindow = window.open('', '_blank');
+    if (!printWindow) {
+      window.print();
+      return;
+    }
+
     printWindow.document.open();
     printWindow.document.write(htmlContent);
     printWindow.document.close();
@@ -292,6 +314,7 @@ export const PrintModal: React.FC<PrintModalProps> = ({ isOpen, coins, onClose }
 
           <button
             onClick={handleOpenNewWindowAndPrint}
+            disabled={isPrinting}
             className="w-full sm:w-auto px-4 py-3 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 text-xs font-bold shadow-lg shadow-amber-950/40 flex items-center justify-center gap-2 transition-all"
           >
             <ExternalLink className="w-4 h-4" />
@@ -479,6 +502,9 @@ export const PrintModal: React.FC<PrintModalProps> = ({ isOpen, coins, onClose }
 
         {/* Modal Footer */}
         <div className="px-4 sm:px-6 py-3 sm:py-4 border-t border-slate-800 bg-[#121318] shrink-0 pb-[max(0.75rem,env(safe-area-inset-bottom))]">
+          {printError && (
+            <p className="mb-2 text-xs text-rose-300" role="alert">{printError}</p>
+          )}
           <p className="hidden sm:block text-xs text-slate-400 mb-3">
             Tipp: <strong className="text-amber-300 font-semibold">"In neuem Druck-Fenster öffnen"</strong> liefert das beste Druckergebnis und speichert als PDF.
           </p>
@@ -491,10 +517,11 @@ export const PrintModal: React.FC<PrintModalProps> = ({ isOpen, coins, onClose }
             </button>
             <button
               onClick={handleOpenNewWindowAndPrint}
+              disabled={isPrinting}
               className="flex-[2] sm:flex-none px-4 py-3 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 text-xs font-bold shadow-lg shadow-amber-950/40 flex items-center justify-center gap-2 transition-all"
             >
               <Printer className="w-4 h-4" />
-              <span>Drucken / PDF</span>
+              <span>{isPrinting ? 'Druckdialog öffnet …' : 'Drucken / PDF'}</span>
             </button>
           </div>
         </div>

@@ -67,6 +67,19 @@ test('epoch chart labels stay short enough for a phone', () => {
   assert.match(stats, /width=\{96\}/);
 });
 
+test('the yellow print buttons use the native iOS print dialog', () => {
+  const modal = source('src/components/PrintModal.tsx');
+  const nativePrint = source('ios/App/App/NativePrint.swift');
+  const project = source('ios/App/App.xcodeproj/project.pbxproj');
+  const packageScript = source('scripts/package-iphone.sh');
+  assert.match(modal, /Capacitor\.getPlatform\(\) === 'ios'/);
+  assert.match(modal, /await NativePrint\.print/);
+  assert.match(nativePrint, /UIPrintInteractionController\.shared/);
+  assert.match(nativePrint, /UIMarkupTextPrintFormatter/);
+  assert.match(project, /NativePrint\.swift in Sources/);
+  assert.match(packageScript, /list\.add\("NativePrintPlugin"\)/);
+});
+
 test('Google and Apple sign-in stay configured for the iPhone build', () => {
   const config = source('capacitor.config.ts');
   const auth = source('src/context/AuthContext.tsx');
