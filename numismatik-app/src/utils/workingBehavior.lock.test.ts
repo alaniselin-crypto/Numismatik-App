@@ -73,7 +73,7 @@ test('Google and Apple sign-in stay configured for the iPhone build', () => {
   assert.match(config, /skipNativeAuth: true/);
   assert.match(config, /googleClientId: firebaseConfig\.oAuthClientId/);
   const plist = source('ios/App/App/Info.plist');
-  assert.match(plist, /com\.googleusercontent\.apps\.211237775065-tebqd2208gith2kee8kc18q753cdlv84/);
+  assert.match(plist, /com\.googleusercontent\.apps\.211237775065-c5l25t57c5oe9bl02gkl2p93qq0mchok/);
 });
 
 test('the iPhone build number stays above the crashing build', () => {
