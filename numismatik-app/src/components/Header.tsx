@@ -94,7 +94,7 @@ export const Header: React.FC<HeaderProps> = ({
           </div>
           <div className="min-w-0">
             <div className="flex items-center gap-1.5 sm:gap-2 min-w-0">
-              <h1 className="text-sm sm:text-lg font-bold text-stone-100 tracking-tight font-serif truncate group-hover:text-amber-400 transition-colors">
+              <h1 className="text-base sm:text-xl font-bold text-stone-100 tracking-tight font-serif truncate group-hover:text-amber-400 transition-colors">
                 Numismatik.App
               </h1>
               <span className="hidden sm:inline-block text-[10px] uppercase font-semibold px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-400 border border-amber-500/20">

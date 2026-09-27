@@ -7,6 +7,12 @@ import { WORLD_COUNTRIES, POPULAR_COIN_COUNTRIES } from '../data/countries';
 import { POPULAR_CURRENCIES } from '../data/currencies';
 import { RARITY_OPTIONS } from '../data/rarities';
 import { auth } from '../lib/firebase';
+import {
+  normalizeRecognizedCondition,
+  normalizeRecognizedCurrency,
+  normalizeRecognizedRarity,
+  parseRecognizedValue,
+} from '../utils/aiCoinRecognition';
 
 const AI_COIN_INFO_URL = 'https://inumis-node-backend.onrender.com/api/generate-coin-info';
 
@@ -206,31 +212,30 @@ export const CoinFormModal: React.FC<CoinFormModalProps> = ({
         throw new Error(data.error || 'Fehler bei der KI-Generierung');
       }
 
-      if (data.title) {
-        setFormData(prev => ({
-          ...prev,
-          name: data.title,
-          country: data.country || prev.country,
-          year: (data.year && !isNaN(Number(data.year))) ? Number(data.year) : prev.year,
-          faceValue: data.faceValue || prev.faceValue,
-          currency: data.currency || prev.currency,
-          material: data.material || prev.material,
-          mintMark: data.mintMark || prev.mintMark,
-          weight: data.weight || prev.weight,
-          diameter: data.diameter || prev.diameter,
-          mintage: data.mintage || prev.mintage,
-          itemType: (data.itemType === 'coin' || data.itemType === 'banknote') ? data.itemType : prev.itemType,
-          condition: ['PP', 'stgl', 'vz', 'ss', 's', 'ge'].includes(data.condition) ? data.condition : prev.condition,
-          rarity: data.rarity || prev.rarity,
-          currentValue: prev.currentValue === 0 && (data.estimatedValue || data.currentValue)
-            ? (Number(data.estimatedValue || data.currentValue) || prev.currentValue)
-            : prev.currentValue,
-          notes: (!prev.notes || prev.notes === 'Keine') && data.description ? data.description : prev.notes
-        }));
-        const valueNote = formData.currentValue === 0 && (data.estimatedValue || data.currentValue) ? ' inkl. Verkaufswert' : '';
-        setAiSuccess(`✨ KI-Erkennung erfolgreich, Felder ausgefüllt${valueNote}: ${data.faceValue || ''} ${data.currency || ''} (${data.year || ''})`);
-        setTimeout(() => setAiSuccess(null), 6000);
-      }
+      const recognizedCondition = normalizeRecognizedCondition(data.condition);
+      const recognizedRarity = normalizeRecognizedRarity(data.rarity);
+      const recognizedValue = parseRecognizedValue(data.currentValue ?? data.estimatedValue);
+      const recognizedCurrency = normalizeRecognizedCurrency(data.currency);
+      setFormData(prev => ({
+        ...prev,
+        name: data.title || prev.name,
+        country: data.country || prev.country,
+        year: (data.year && !isNaN(Number(data.year))) ? Number(data.year) : prev.year,
+        faceValue: data.faceValue || prev.faceValue,
+        currency: recognizedCurrency || prev.currency,
+        material: data.material || prev.material,
+        mintMark: data.mintMark || prev.mintMark,
+        weight: data.weight || prev.weight,
+        diameter: data.diameter || prev.diameter,
+        mintage: data.mintage || prev.mintage,
+        itemType: (data.itemType === 'coin' || data.itemType === 'banknote') ? data.itemType : prev.itemType,
+        condition: recognizedCondition || prev.condition,
+        rarity: recognizedRarity || prev.rarity,
+        currentValue: recognizedValue ?? prev.currentValue,
+        notes: (!prev.notes || prev.notes === 'Keine') && data.description ? data.description : prev.notes
+      }));
+      setAiSuccess(`✨ KI-Erkennung erfolgreich: Seltenheit, Erhaltung, Verkaufswert und Material wurden übernommen.`);
+      setTimeout(() => setAiSuccess(null), 6000);
     } catch (err: any) {
       alert(err.message || 'Fehler bei der KI-Generierung');
     } finally {
@@ -311,7 +316,7 @@ export const CoinFormModal: React.FC<CoinFormModalProps> = ({
       name: formData.name.trim(),
       country: formData.country.trim(),
       faceValue: formData.faceValue.trim(),
-      currency: formData.currency.trim(),
+      currency: normalizeRecognizedCurrency(formData.currency),
       year: Number(formData.year),
       condition: formData.condition,
       purchasePrice: Number(formData.purchasePrice),
@@ -832,6 +837,7 @@ export const CoinFormModal: React.FC<CoinFormModalProps> = ({
                     list="world-currencies-list"
                     value={formData.currency}
                     onChange={e => setFormData({ ...formData, currency: e.target.value })}
+                    onBlur={() => setFormData(prev => ({ ...prev, currency: normalizeRecognizedCurrency(prev.currency) }))}
                     placeholder="Währung eingeben oder auswählen (z.B. CHF, ARS, EUR)..."
                     className={`w-full px-3.5 py-2.5 rounded-xl bg-slate-900 border text-sm font-semibold text-amber-300 focus:outline-none focus:ring-2 focus:ring-amber-500/50 ${
                       errors.currency ? 'border-rose-500' : 'border-slate-800'

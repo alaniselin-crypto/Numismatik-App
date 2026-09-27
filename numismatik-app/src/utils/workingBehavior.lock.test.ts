@@ -68,6 +68,20 @@ test('epoch chart labels stay short enough for a phone', () => {
   assert.match(stats, /width=\{96\}/);
 });
 
+test('the mobile title and AI recognition fields stay configured', () => {
+  const header = source('src/components/Header.tsx');
+  const form = source('src/components/CoinFormModal.tsx');
+  const server = source('server.ts');
+  assert.match(header, /text-base sm:text-xl[\s\S]*Numismatik\.App/);
+  assert.match(form, /normalizeRecognizedCurrency/);
+  assert.match(form, /normalizeRecognizedCondition/);
+  assert.match(form, /normalizeRecognizedRarity/);
+  assert.match(form, /parseRecognizedValue/);
+  assert.match(server, /Verkaufswert \(currentValue\)/);
+  assert.match(server, /"currentValue": 25/);
+  assert.match(server, /\["FR", "FRS", "SFR", "FRANKEN", "SCHWEIZERFRANKEN"\]/);
+});
+
 test('the yellow print buttons use the native iOS print dialog', () => {
   const modal = source('src/components/PrintModal.tsx');
   const nativePrint = source('ios/App/App/NativePrint.swift');
