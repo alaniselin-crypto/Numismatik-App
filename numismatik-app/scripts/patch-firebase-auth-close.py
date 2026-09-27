@@ -105,7 +105,7 @@ GOOGLE_OLD = """        guard let clientId = FirebaseApp.app()?.options.clientID
         let config = GIDConfiguration(clientID: clientId, serverClientID: clientId)
 """
 
-GOOGLE_NEW = """        let clientId = FirebaseApp.app()?.options.clientID ?? self.pluginImplementation.getConfig().googleClientId
+GOOGLE_DESKTOP_CLIENT = """        let clientId = FirebaseApp.app()?.options.clientID ?? self.pluginImplementation.getConfig().googleClientId
         guard let clientId else {
             let message = "Google-Anmeldung ist auf diesem iPhone nicht eingerichtet."
             if isLink == true {
@@ -116,6 +116,19 @@ GOOGLE_NEW = """        let clientId = FirebaseApp.app()?.options.clientID ?? se
             return
         }
         let config = GIDConfiguration(clientID: clientId, serverClientID: clientId)
+"""
+
+GOOGLE_NEW = """        let clientId = FirebaseApp.app()?.options.clientID ?? self.pluginImplementation.getConfig().googleClientId
+        guard let clientId else {
+            let message = "Google-Anmeldung ist auf diesem iPhone nicht eingerichtet."
+            if isLink == true {
+                pluginImplementation.handleFailedLink(message: message, error: nil)
+            } else {
+                pluginImplementation.handleFailedSignIn(message: message, error: nil)
+            }
+            return
+        }
+        let config = GIDConfiguration(clientID: clientId)
 """
 
 DEINIT_BLOCK = """
@@ -185,6 +198,17 @@ def replace_once(path: Path, old: str, new: str, label: str) -> None:
     path.write_text(text.replace(old, new, 1))
     print(f"{path.name}: {label} applied")
 
+def replace_google_client(path: Path) -> None:
+    text = path.read_text()
+    if GOOGLE_NEW in text:
+        print(f"{path.name}: native Google client already applied")
+        return
+    old = GOOGLE_DESKTOP_CLIENT if GOOGLE_DESKTOP_CLIENT in text else GOOGLE_OLD
+    if old not in text:
+        raise SystemExit(f"{path}: could not find the Google client block")
+    path.write_text(text.replace(old, GOOGLE_NEW, 1))
+    print(f"{path.name}: native Google client applied")
+
 
 def main() -> None:
     if not AUTH.exists() or not BRIDGE.exists():
@@ -195,7 +219,7 @@ def main() -> None:
     google_path = PLUGIN / "Handlers" / "GoogleAuthProviderHandler.swift"
     replace_once(config_path, CONFIG_OLD, CONFIG_NEW, "google client id")
     replace_once(BRIDGE, PROVIDERS_OLD, PROVIDERS_NEW, "provider list")
-    replace_once(google_path, GOOGLE_OLD, GOOGLE_NEW, "google client fallback")
+    replace_google_client(google_path)
     auth_text = AUTH.read_text()
     if DEINIT_BLOCK in auth_text:
         AUTH.write_text(auth_text.replace(DEINIT_BLOCK, "\n", 1))

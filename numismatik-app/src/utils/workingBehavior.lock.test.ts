@@ -71,10 +71,11 @@ test('Google and Apple sign-in stay configured for the iPhone build', () => {
   const config = source('capacitor.config.ts');
   assert.match(config, /providers: \['apple\.com', 'google\.com'\]/);
   assert.match(config, /skipNativeAuth: true/);
-  assert.match(config, /googleClientId: firebaseConfig\.oAuthClientId/);
-  assert.match(source('src/context/AuthContext.tsx'), /GoogleDesktopSignIn\.signIn\(\)/);
+  assert.match(config, /googleClientId: iosGoogleClientId/);
+  assert.match(config, /211237775065-86r14bsi0as6u0an1gqf7c48dv7chr1g/);
+  assert.match(source('src/context/AuthContext.tsx'), /FirebaseAuthentication\.signInWithGoogle/);
   const plist = source('ios/App/App/Info.plist');
-  assert.match(plist, /com\.googleusercontent\.apps\.211237775065-c5l25t57c5oe9bl02gkl2p93qq0mchok/);
+  assert.match(plist, /com\.googleusercontent\.apps\.211237775065-86r14bsi0as6u0an1gqf7c48dv7chr1g/);
 });
 
 test('the iPhone build number stays above the crashing build', () => {
@@ -88,6 +89,7 @@ test('the iOS auth patch does not sign out or tear Firebase down', () => {
   const patch = source('scripts/patch-firebase-auth-close.py');
   assert.match(patch, /providers\.compactMap \{ \$0 as\? String \}/);
   assert.match(patch, /googleClientId/);
+  assert.match(patch, /GIDConfiguration\(clientID: clientId\)/);
   assert.match(patch, /if FirebaseApp\.app\(\) != nil/);
   assert.match(patch, /deinit already absent/);
   assert.equal(patch.includes('DEINIT_INSERT'), false);

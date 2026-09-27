@@ -20,7 +20,6 @@ import { auth, googleProvider } from '../lib/firebase';
 import { deleteAccountOnServer, deleteTestAppleAccountOnServer } from '../utils/accountDeletionApi';
 import { persistAccountDeletionDiagnostic } from '../utils/accountDeletionDiagnostic';
 import { resolveAccountDeletionProvider } from '../utils/accountDeletionProvider';
-import { GoogleDesktopSignIn } from '../utils/googleDesktopSignIn';
 
 
 export interface AppUser {
@@ -111,15 +110,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const loginWithGoogle = async () => {
-    if (Capacitor.getPlatform() === 'ios') {
-      const result = await GoogleDesktopSignIn.signIn();
-      if (!result.idToken) {
-        throw new Error('Native Google Sign-In returned no ID token.');
-      }
-      const credential = GoogleAuthProvider.credential(result.idToken, result.accessToken ?? null);
-      await signInWithCredential(auth, credential);
-      return;
-    }
     if (Capacitor.isNativePlatform()) {
       const result = await FirebaseAuthentication.signInWithGoogle({ skipNativeAuth: true });
       const idToken = result.credential?.idToken ?? null;
@@ -226,12 +216,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         await runLoggedAccountDeletionStage(
           `Google reauthentication (native) [providers=${providerSummary}; originalUidPresent=${originalUid.length > 0}]`,
           async () => {
-            const result = Capacitor.getPlatform() === 'ios'
-              ? await GoogleDesktopSignIn.signIn()
-              : await FirebaseAuthentication.signInWithGoogle({ skipNativeAuth: true }).then(native => ({
-                  idToken: native.credential?.idToken ?? null,
-                  accessToken: native.credential?.accessToken ?? null,
-                }));
+            const result = await FirebaseAuthentication.signInWithGoogle({ skipNativeAuth: true }).then(native => ({
+              idToken: native.credential?.idToken ?? null,
+              accessToken: native.credential?.accessToken ?? null,
+            }));
             const idToken = result.idToken ?? null;
             const accessToken = result.accessToken ?? null;
             if (!idToken) throw new Error('auth/missing-google-token');
