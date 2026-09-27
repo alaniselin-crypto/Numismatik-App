@@ -37,7 +37,11 @@ cat > "$STAGE/ANLEITUNG.txt" << 'EOF'
 Numismatik auf dem iPhone öffnen
 =================================
 
-Du brauchst einen Mac mit Xcode (Version 16 oder neuer) und ein iPhone mit Kabel.
+Das ist Build 30. Er enthält die Korrekturen für Diagramme, Listenansicht,
+das Schild «Avers», die Anmeldung und den Absturz beim Schließen.
+
+Den alten Xcode-Ordner nicht noch einmal archivieren. Der erzeugt wieder
+die alte App.
 
 1. Diese Zip-Datei auf den Mac kopieren und entpacken.
    Den Ordner danach nicht auseinandernehmen: «ios» und «node_modules» müssen nebeneinander bleiben.
@@ -45,23 +49,23 @@ Du brauchst einen Mac mit Xcode (Version 16 oder neuer) und ein iPhone mit Kabel
 2. Xcode öffnen und diese Datei wählen:
    ios → App → App.xcodeproj
 
-3. Oben in Xcode links neben dem Play-Knopf dein iPhone auswählen
-   (nicht «Any iOS Device»).
+3. Oben «Any iOS Device» wählen.
 
 4. Im Projekt links auf «App» klicken, dann den Reiter «Signing & Capabilities».
    Haken bei «Automatically manage signing».
-   Bei Team deine Apple-ID auswählen. Eine kostenlose Apple-ID reicht zum Ausprobieren.
+   Bei Team «Alan Iselin» auswählen.
 
-5. iPhone per Kabel anschliessen. Auf dem iPhone «Vertrauen» tippen.
-   Falls Xcode nach dem Entwicklermodus fragt: auf dem iPhone unter
-   Einstellungen → Datenschutz & Sicherheit → Entwicklermodus einschalten.
+5. Menü Product → Archive.
+   Danach Distribute App → App Store Connect → Upload.
 
-6. Play-Knopf in Xcode drücken. Die App «Numismatik» startet auf dem iPhone.
+6. In App Store Connect unter TestFlight auf Build 1.0 (30) warten.
+   Status zuerst «Wird verarbeitet», dann «Abgeschlossen».
+   Danach in der TestFlight-App auf dem iPhone auf Aktualisieren tippen.
 
-Beim ersten Start kann Xcode ein paar Minuten Pakete laden (Capacitor, Firebase).
+Beim ersten Archive kann Xcode ein paar Minuten Pakete laden (Capacitor, Firebase).
 Das ist normal, solange der Mac online ist.
 
-Ohne Anmeldung siehst du die Sammlung lokal auf dem Gerät.
+Wenn ein Fenster «Create Git repositories» kommt: Cancel.
 EOF
 
 OUT="${1:-$ROOT/../Numismatik-iPhone.zip}"
