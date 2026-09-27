@@ -2,8 +2,10 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Capacitor } from '@capacitor/core';
 import { Coin, TabType } from './types';
 import { 
-  loadCoinsFromStorage, 
   saveCoinsToStorage, 
+  loadSavedDeviceCoins,
+  loadSavedDeviceFolders,
+  loadSavedDevicePlatforms,
   resetCoinsToSampleData, 
   INITIAL_SAMPLE_COINS,
   loadCustomFolders,
@@ -82,6 +84,7 @@ import { AuthModal } from './components/AuthModal';
 import { AppInfoModal } from './components/AppInfoModal';
 import { HeroDownloadModal } from './components/HeroDownloadModal';
 import { isAdminUser, setLocalAdmin } from './utils/admin';
+import { collectionToKeepOnSignOut } from './utils/signedOutCollection';
 
 const CATALOG_NUMBER_RESET_VERSION = 23;
 
@@ -127,6 +130,13 @@ export default function App() {
   const [importToast, setImportToast] = useState<string | null>(null);
   const [isFetchingWebhooks, setIsFetchingWebhooks] = useState<boolean>(false);
   const webhookImportRunningRef = useRef(false);
+  const signedInUidRef = useRef<string | null>(null);
+  const coinsRef = useRef(coins);
+  const foldersRef = useRef(folders);
+  const platformsRef = useRef(platforms);
+  coinsRef.current = coins;
+  foldersRef.current = folders;
+  platformsRef.current = platforms;
 
   // Preserve existing inventory numbers while normalizing display names.
   const ensureCoinSKUs = (rawCoins: Coin[]): Coin[] => {
@@ -246,6 +256,7 @@ export default function App() {
     if (loading) return;
 
     if (userUid) {
+      signedInUidRef.current = userUid;
       let cancelled = false;
       const localCoins = ensureCoinSKUs(loadUserCoinsFromStorage(userUid));
       const localFolders = loadUserFoldersFromStorage(userUid);
@@ -333,9 +344,39 @@ export default function App() {
 
       return () => { cancelled = true; };
     } else {
-      setCoins([]);
-      setFolders([]);
-      setPlatforms([]);
+      const kept = collectionToKeepOnSignOut({
+        previousUid: signedInUidRef.current,
+        visible: {
+          coins: coinsRef.current,
+          folders: foldersRef.current,
+          platforms: platformsRef.current,
+        },
+        account: signedInUidRef.current
+          ? {
+              coins: loadUserCoinsFromStorage(signedInUidRef.current),
+              folders: loadUserFoldersFromStorage(signedInUidRef.current),
+              platforms: loadUserPlatformsFromStorage(signedInUidRef.current),
+            }
+          : { coins: [], folders: [], platforms: [] },
+        device: (() => {
+          const savedCoins = loadSavedDeviceCoins();
+          if (!savedCoins) return null;
+          return {
+            coins: savedCoins,
+            folders: loadSavedDeviceFolders() ?? [],
+            platforms: loadSavedDevicePlatforms() ?? [],
+          };
+        })(),
+      });
+      if (kept.saveOnDevice) {
+        saveCoinsToStorage(kept.collection.coins);
+        saveCustomFolders(kept.collection.folders);
+        saveCustomPlatforms(kept.collection.platforms);
+      }
+      signedInUidRef.current = null;
+      setCoins(ensureCoinSKUs(kept.collection.coins));
+      setFolders(kept.collection.folders);
+      setPlatforms(kept.collection.platforms);
     }
   }, [userUid, loading]);
 

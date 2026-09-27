@@ -210,7 +210,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
     setIsLoading(true);
     try {
       await logout();
-      setSuccessMsg('Erfolgreich abgemeldet.');
+      setSuccessMsg('Abgemeldet. Die Sammlung bleibt auf diesem Gerät.');
       setTimeout(() => {
         onClose();
       }, 800);

@@ -464,6 +464,31 @@ export function saveCoinsToStorage(coins: Coin[]): void {
   }
 }
 
+function readSavedDeviceArray<T>(key: string, isValid: (value: unknown) => value is T): T[] | null {
+  try {
+    const raw = localStorage.getItem(key);
+    if (raw === null) return null;
+    const parsed: unknown = JSON.parse(raw);
+    return Array.isArray(parsed) ? parsed.filter(isValid) : null;
+  } catch (error) {
+    console.error(`Failed to load saved device data from ${key}:`, error);
+    return null;
+  }
+}
+
+/** Coins already stored on this device. Does not create the sample collection. */
+export function loadSavedDeviceCoins(): Coin[] | null {
+  return readSavedDeviceArray(STORAGE_KEY, isCoin);
+}
+
+export function loadSavedDeviceFolders(): string[] | null {
+  return readSavedDeviceArray(FOLDERS_STORAGE_KEY, isString);
+}
+
+export function loadSavedDevicePlatforms(): string[] | null {
+  return readSavedDeviceArray(PLATFORMS_STORAGE_KEY, isString);
+}
+
 export function resetCoinsToSampleData(): Coin[] {
   saveCoinsToStorage(INITIAL_SAMPLE_COINS);
   return INITIAL_SAMPLE_COINS;
