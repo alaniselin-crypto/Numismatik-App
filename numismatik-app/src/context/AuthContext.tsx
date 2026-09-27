@@ -77,57 +77,21 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
-    let unsubscribe = () => {};
-    let cancelled = false;
-
-    const listen = () => {
-      unsubscribe = onAuthStateChanged(auth, (currentUser) => {
-        if (cancelled) return;
-        if (currentUser) {
-          setUser({
-            uid: currentUser.uid,
-            email: currentUser.email,
-            displayName: currentUser.displayName,
-            providerIds: currentUser.providerData.map(provider => provider.providerId),
-          });
-        } else {
-          setUser(null);
-        }
-        setLoading(false);
-      });
-    };
-
-    if (!Capacitor.isNativePlatform()) {
-      listen();
-      return () => {
-        cancelled = true;
-        unsubscribe();
-      };
-    }
-
-    // The iPhone app must open signed out. A session from an older build is
-    // cleared before the first listener, including the native keychain user.
-    void (async () => {
-      try {
-        await FirebaseAuthentication.signOut();
-      } catch (error) {
-        console.error('Native session could not be cleared on launch:', error);
+    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+      if (currentUser) {
+        setUser({
+          uid: currentUser.uid,
+          email: currentUser.email,
+          displayName: currentUser.displayName,
+          providerIds: currentUser.providerData.map(provider => provider.providerId),
+        });
+      } else {
+        setUser(null);
       }
-      try {
-        await signOut(auth);
-      } catch (error) {
-        const code = (error as { code?: string })?.code;
-        if (code !== 'auth/no-current-user') {
-          console.error('Stored session could not be cleared on launch:', error);
-        }
-      }
-      if (!cancelled) listen();
-    })();
+      setLoading(false);
+    });
 
-    return () => {
-      cancelled = true;
-      unsubscribe();
-    };
+    return unsubscribe;
   }, []);
 
   const loginWithEmail = async (email: string, pass: string) => {

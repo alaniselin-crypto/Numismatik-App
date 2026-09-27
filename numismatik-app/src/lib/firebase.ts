@@ -5,9 +5,20 @@ import { Capacitor } from '@capacitor/core';
 import firebaseConfig from '../../firebase-applet-config.json';
 
 const app = initializeApp(firebaseConfig);
-export const auth = Capacitor.isNativePlatform()
-  ? initializeAuth(app, { persistence: inMemoryPersistence })
-  : getAuth(app);
+
+function createAuth() {
+  if (!Capacitor.isNativePlatform()) {
+    return getAuth(app);
+  }
+  try {
+    return initializeAuth(app, { persistence: inMemoryPersistence });
+  } catch (error) {
+    console.error('In-memory auth could not start:', error);
+    return getAuth(app);
+  }
+}
+
+export const auth = createAuth();
 export const db = getFirestore(app, firebaseConfig.firestoreDatabaseId || '(default)');
 export const googleProvider = new GoogleAuthProvider();
 

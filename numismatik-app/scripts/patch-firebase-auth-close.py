@@ -56,17 +56,7 @@ AUTH_NEW = """    private var phoneAuthProviderHandler: PhoneAuthProviderHandler
         }
 """
 
-DEINIT_ANCHOR = """        if let authDomain = config.authDomain {
-            Auth.auth().customAuthDomain = authDomain
-        }
-    }
-"""
-
-DEINIT_INSERT = """        if let authDomain = config.authDomain {
-            Auth.auth().customAuthDomain = authDomain
-        }
-    }
-
+DEINIT_BLOCK = """
     deinit {
         if let authStateListenerHandle {
             Auth.auth().removeStateDidChangeListener(authStateListenerHandle)
@@ -138,7 +128,12 @@ def main() -> None:
     if not AUTH.exists() or not BRIDGE.exists():
         raise SystemExit("Firebase Authentication iOS plugin was not installed")
     replace_once(AUTH, AUTH_OLD, AUTH_NEW, "listener handles")
-    replace_once(AUTH, DEINIT_ANCHOR, DEINIT_INSERT, "listener removal")
+    auth_text = AUTH.read_text()
+    if DEINIT_BLOCK in auth_text:
+        AUTH.write_text(auth_text.replace(DEINIT_BLOCK, "\n", 1))
+        print(f"{AUTH.name}: deinit removed")
+    else:
+        print(f"{AUTH.name}: deinit already absent")
     replace_once(BRIDGE, BRIDGE_OLD, BRIDGE_NEW, "bridge guard")
 
 
