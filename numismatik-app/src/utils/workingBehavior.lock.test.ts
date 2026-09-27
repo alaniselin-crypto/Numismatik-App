@@ -69,13 +69,19 @@ test('epoch chart labels stay short enough for a phone', () => {
 
 test('Google and Apple sign-in stay configured for the iPhone build', () => {
   const config = source('capacitor.config.ts');
+  const auth = source('src/context/AuthContext.tsx');
+  const patch = source('scripts/patch-firebase-auth-close.py');
   assert.match(config, /providers: \['apple\.com', 'google\.com'\]/);
   assert.match(config, /skipNativeAuth: true/);
   assert.match(config, /googleClientId: iosGoogleClientId/);
   assert.match(config, /211237775065-86r14bsi0as6u0an1gqf7c48dv7chr1g/);
-  assert.match(source('src/context/AuthContext.tsx'), /FirebaseAuthentication\.signInWithGoogle/);
+  assert.equal(config.includes('googleClientId: firebaseConfig.oAuthClientId'), false);
+  assert.match(auth, /FirebaseAuthentication\.signInWithGoogle\(\{ skipNativeAuth: true \}\)/);
+  assert.equal(auth.includes('GoogleDesktopSignIn'), false);
+  assert.match(patch, /GOOGLE_NEW = """[\s\S]*GIDConfiguration\(clientID: clientId\)\n"""/);
   const plist = source('ios/App/App/Info.plist');
   assert.match(plist, /com\.googleusercontent\.apps\.211237775065-86r14bsi0as6u0an1gqf7c48dv7chr1g/);
+  assert.equal(plist.includes('com.googleusercontent.apps.211237775065-c5l25t57c5oe9bl02gkl2p93qq0mchok'), false);
 });
 
 test('the iPhone build number stays above the crashing build', () => {
