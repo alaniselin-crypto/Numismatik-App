@@ -18,6 +18,7 @@ const path = "ios/App/App/capacitor.config.json";
 const config = JSON.parse(fs.readFileSync(path, "utf8"));
 const list = new Set(config.packageClassList ?? []);
 list.add("AppleStoreKitPlugin");
+list.add("GoogleDesktopSignInPlugin");
 config.packageClassList = [...list];
 fs.writeFileSync(path, JSON.stringify(config, null, "\t") + "\n");
 EOF
@@ -39,7 +40,8 @@ cat > "$STAGE/ANLEITUNG.txt" << 'EOF'
 Numismatik auf dem iPhone öffnen
 =================================
 
-Das ist Build 35. Die Google-Anmeldung benutzt den Schlüssel, den Google noch akzeptiert.
+Das ist Build 36. Die Google-Anmeldung holt das Geheimnis vom Render-Server,
+so wie die Mac-App.
 
 Den alten Xcode-Ordner nicht noch einmal archivieren. Der erzeugt wieder
 die alte App.
@@ -59,7 +61,7 @@ die alte App.
 5. Menü Product → Archive.
    Danach Distribute App → App Store Connect → Upload.
 
-6. In App Store Connect unter TestFlight auf Build 1.0 (35) warten.
+6. In App Store Connect unter TestFlight auf Build 1.0 (36) warten.
    Status zuerst «Wird verarbeitet», dann «Abgeschlossen».
    Danach in der TestFlight-App auf dem iPhone auf Aktualisieren tippen.
 

@@ -72,6 +72,7 @@ test('Google and Apple sign-in stay configured for the iPhone build', () => {
   assert.match(config, /providers: \['apple\.com', 'google\.com'\]/);
   assert.match(config, /skipNativeAuth: true/);
   assert.match(config, /googleClientId: firebaseConfig\.oAuthClientId/);
+  assert.match(source('src/context/AuthContext.tsx'), /GoogleDesktopSignIn\.signIn\(\)/);
   const plist = source('ios/App/App/Info.plist');
   assert.match(plist, /com\.googleusercontent\.apps\.211237775065-c5l25t57c5oe9bl02gkl2p93qq0mchok/);
 });
