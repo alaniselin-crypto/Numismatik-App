@@ -6,8 +6,6 @@ import {
   loadSavedDeviceCoins,
   loadSavedDeviceFolders,
   loadSavedDevicePlatforms,
-  resetCoinsToSampleData, 
-  INITIAL_SAMPLE_COINS,
   loadCustomFolders,
   saveCustomFolders,
   renameFolderInCoinsAndStorage,
@@ -1113,39 +1111,6 @@ export default function App() {
     }
   };
 
-  // Reset Data Handler
-  const handleResetToSampleData = async () => {
-    await preserveIssuedCatalogNumbers(coins);
-    const resetIdPrefix = `sample-${Date.now()}-${Math.random().toString(36).slice(2, 9)}`;
-    const resetList = userUid
-      ? INITIAL_SAMPLE_COINS.map((coin, index) => ({
-          ...coin,
-          id: `${resetIdPrefix}-${index + 1}`,
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString(),
-        }))
-      : resetCoinsToSampleData();
-    if (userUid) {
-      for (const coin of coins) {
-        try {
-          await persistCoinDeletionForUser(userUid, coin.id);
-        } catch (error) {
-          console.error('Reset deletion queued for retry:', error);
-        }
-      }
-    }
-    updateCoinsState(resetList);
-    if (userUid) {
-      for (const coin of resetList) {
-        try {
-          await persistCoinForUser(userUid, coin);
-        } catch (error) {
-          console.error('Reset sample coin queued for retry:', error);
-        }
-      }
-    }
-  };
-
   // Clear All Coins Handler
   const handleClearAllCoins = async () => {
     await preserveIssuedCatalogNumbers(coins);
@@ -1330,7 +1295,6 @@ export default function App() {
           <BackupExportView
             coins={coins}
             onImportCoins={handleImportCoins}
-            onResetToSampleData={handleResetToSampleData}
             onClearAllCoins={handleClearAllCoins}
           />
         )}

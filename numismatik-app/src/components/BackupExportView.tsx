@@ -1,26 +1,23 @@
 import React, { useState } from 'react';
-import { Download, Upload, RefreshCw, FileSpreadsheet, CheckCircle2, AlertTriangle, ShieldCheck, FileText, ImagePlus } from 'lucide-react';
+import { Download, Upload, FileSpreadsheet, CheckCircle2, AlertTriangle, ShieldCheck, FileText, ImagePlus } from 'lucide-react';
 import { Coin } from '../types';
 import { exportCoinsToCSV, downloadCSVFile, parseCSVToCoins, downloadCSVTemplate, parseImageSideAndBaseName } from '../utils/csv';
 
 interface BackupExportViewProps {
   coins: Coin[];
   onImportCoins: (newCoins: Coin[], replaceExisting: boolean) => void;
-  onResetToSampleData: () => void;
   onClearAllCoins?: () => void;
 }
 
 export const BackupExportView: React.FC<BackupExportViewProps> = ({
   coins,
   onImportCoins,
-  onResetToSampleData,
   onClearAllCoins
 }) => {
   const [importErrors, setImportErrors] = useState<string[]>([]);
   const [importSuccessMsg, setImportSuccessMsg] = useState<string>('');
   const [replaceMode, setReplaceMode] = useState<boolean>(false);
   const [showConfirmClear, setShowConfirmClear] = useState<boolean>(false);
-  const [showConfirmReset, setShowConfirmReset] = useState<boolean>(false);
   const [isImageImporting, setIsImageImporting] = useState<boolean>(false);
 
   // Compress image file to base64 data URI (max 800px, JPEG 85%)
@@ -371,15 +368,14 @@ export const BackupExportView: React.FC<BackupExportViewProps> = ({
         </div>
       )}
 
-      {/* Demo Reset & Clear Section */}
+      {/* Collection deletion */}
       <div className="bg-[#181a22] border border-slate-800 rounded-2xl p-6 shadow-lg flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
           <h3 className="text-base font-bold font-serif text-slate-100 flex items-center gap-2">
-            <RefreshCw className="w-4 h-4 text-amber-400" />
-            Sammlung Verwalten & Zurücksetzen
+            Sammlung verwalten
           </h3>
           <p className="text-xs text-slate-400 mt-1">
-            Löschen Sie die aktuelle Sammlung ({coins.length} Münzen) vollständig oder setzen Sie sie auf Musterdaten zurück.
+            Löschen Sie die aktuelle Sammlung ({coins.length} Münzen) vollständig.
           </p>
         </div>
 
@@ -409,7 +405,6 @@ export const BackupExportView: React.FC<BackupExportViewProps> = ({
               <button
                 onClick={() => {
                   setShowConfirmClear(true);
-                  setShowConfirmReset(false);
                 }}
                 disabled={coins.length === 0}
                 className="px-4 py-2.5 text-xs font-semibold text-rose-300 hover:text-white bg-rose-950/70 hover:bg-rose-900 border border-rose-700/60 rounded-xl transition-all disabled:opacity-40 shrink-0 shadow-sm"
@@ -417,38 +412,6 @@ export const BackupExportView: React.FC<BackupExportViewProps> = ({
                 🗑️ Alle {coins.length} Münzen Löschen
               </button>
             )
-          )}
-
-          {showConfirmReset ? (
-            <div className="flex items-center gap-2 bg-slate-900 border border-amber-500/50 rounded-xl p-1.5 animate-fadeIn">
-              <span className="text-[11px] text-amber-200 font-medium px-1">Auf Musterdaten zurücksetzen?</span>
-              <button
-                onClick={() => {
-                  onResetToSampleData();
-                  setShowConfirmReset(false);
-                  setImportSuccessMsg('Sammlung wurde auf Beispiel-Münzen zurückgesetzt.');
-                }}
-                className="px-3 py-1.5 text-xs font-bold text-slate-950 bg-amber-400 hover:bg-amber-300 rounded-lg shadow transition-all active:scale-95"
-              >
-                Ja, Zurücksetzen
-              </button>
-              <button
-                onClick={() => setShowConfirmReset(false)}
-                className="px-2.5 py-1.5 text-xs font-medium text-stone-300 hover:text-white bg-stone-800 hover:bg-stone-700 rounded-lg transition-all"
-              >
-                Abbrechen
-              </button>
-            </div>
-          ) : (
-            <button
-              onClick={() => {
-                setShowConfirmReset(true);
-                setShowConfirmClear(false);
-              }}
-              className="px-4 py-2.5 text-xs font-semibold text-slate-300 hover:text-amber-300 bg-slate-800 hover:bg-slate-700 border border-slate-700 rounded-xl transition-all shrink-0"
-            >
-              Auf Beispiel-Münzen Zurücksetzen
-            </button>
           )}
         </div>
       </div>

@@ -78,6 +78,19 @@ test('small iPhone text stays readable and sales value stays optional', () => {
   assert.equal(form.includes('Verkaufswert muss mindestens 0 sein.'), false);
 });
 
+test('the app cannot restore example coins', () => {
+  const app = source('src/App.tsx');
+  const backup = source('src/components/BackupExportView.tsx');
+  const storage = source('src/utils/storage.ts');
+  assert.equal(app.includes('handleResetToSampleData'), false);
+  assert.equal(app.includes('INITIAL_SAMPLE_COINS'), false);
+  assert.equal(backup.includes('onResetToSampleData'), false);
+  assert.equal(backup.includes('Auf Beispiel-Münzen Zurücksetzen'), false);
+  assert.equal(backup.includes('setzen Sie sie auf Musterdaten zurück'), false);
+  assert.equal(storage.includes('function resetCoinsToSampleData'), false);
+  assert.match(storage, /function loadCoinsFromStorage\(\): Coin\[\] \{[\s\S]*return \[\];/);
+});
+
 test('the coin grid does not print Avers on the picture', () => {
   const card = source('src/components/CoinCard.tsx');
   assert.equal(card.includes('>Avers<'), false);

@@ -459,8 +459,7 @@ export function loadCoinsFromStorage(): Coin[] {
         return parsed;
       }
     }
-    saveCoinsToStorage(INITIAL_SAMPLE_COINS);
-    return INITIAL_SAMPLE_COINS;
+    return [];
   } catch (error) {
     console.error('Failed to load coin collection from localStorage:', error);
     return [];
@@ -498,11 +497,6 @@ export function loadSavedDeviceFolders(): string[] | null {
 
 export function loadSavedDevicePlatforms(): string[] | null {
   return readSavedDeviceArray(PLATFORMS_STORAGE_KEY, isString);
-}
-
-export function resetCoinsToSampleData(): Coin[] {
-  saveCoinsToStorage(INITIAL_SAMPLE_COINS);
-  return INITIAL_SAMPLE_COINS;
 }
 
 export function formatCurrency(amount: number, currencySymbol: string = 'CHF'): string {
