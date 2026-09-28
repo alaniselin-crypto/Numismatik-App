@@ -66,6 +66,18 @@ test('phone layout keeps charts and the coin list readable', () => {
   assert.match(source('src/components/CoinList.tsx'), /className="collection-table /);
 });
 
+test('small iPhone text stays readable and sales value stays optional', () => {
+  const css = source('src/index.css');
+  const form = source('src/components/CoinFormModal.tsx');
+  assert.match(css, /#root \.text-\\\[10px\\\] \{[\s\S]*font-size: 12px !important;/);
+  assert.match(css, /#root \.text-\\\[11px\\\] \{[\s\S]*font-size: 13px !important;/);
+  assert.match(css, /#root \.text-xs \{[\s\S]*font-size: 14px !important;/);
+  assert.match(css, /#root \.text-sm \{[\s\S]*font-size: 16px !important;/);
+  assert.match(form, /Verkaufswert \(CHF\)[\s\S]*\(Optional\)/);
+  assert.equal(form.includes('Verkaufswert (CHF) *'), false);
+  assert.equal(form.includes('Verkaufswert muss mindestens 0 sein.'), false);
+});
+
 test('the coin grid does not print Avers on the picture', () => {
   const card = source('src/components/CoinCard.tsx');
   assert.equal(card.includes('>Avers<'), false);

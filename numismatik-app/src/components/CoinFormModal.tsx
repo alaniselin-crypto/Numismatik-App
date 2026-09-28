@@ -292,8 +292,8 @@ export const CoinFormModal: React.FC<CoinFormModalProps> = ({
     if (isNaN(formData.year) || formData.year < -1000 || formData.year > 2100) {
       newErrors.year = 'Ungültiges Prägejahr.';
     }
-    if (isNaN(formData.currentValue) || formData.currentValue < 0) {
-      newErrors.currentValue = 'Verkaufswert muss mindestens 0 sein.';
+    if (formData.currentValue < 0) {
+      newErrors.currentValue = 'Verkaufswert darf nicht negativ sein.';
     }
     setErrors(newErrors);
     const isValid = Object.keys(newErrors).length === 0;
@@ -936,7 +936,7 @@ export const CoinFormModal: React.FC<CoinFormModalProps> = ({
 
               <div>
                 <label className="block text-xs font-bold text-amber-300 mb-1">
-                  Verkaufswert (CHF) * <span className="text-[10px] text-rose-400 font-normal">(Pflichtfeld)</span>
+                  Verkaufswert (CHF) <span className="text-[10px] text-slate-400 font-normal">(Optional)</span>
                 </label>
                 <input
                   type="number"
