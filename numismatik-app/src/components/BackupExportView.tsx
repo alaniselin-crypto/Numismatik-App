@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Download, Upload, FileSpreadsheet, CheckCircle2, AlertTriangle, ShieldCheck, FileText, ImagePlus } from 'lucide-react';
+import { Download, Upload, RefreshCw, FileSpreadsheet, CheckCircle2, AlertTriangle, ShieldCheck, FileText, ImagePlus } from 'lucide-react';
 import { Coin } from '../types';
 import { exportCoinsToCSV, downloadCSVFile, parseCSVToCoins, downloadCSVTemplate, parseImageSideAndBaseName } from '../utils/csv';
 
