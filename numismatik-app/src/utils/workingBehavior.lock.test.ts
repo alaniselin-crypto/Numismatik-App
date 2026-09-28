@@ -90,8 +90,12 @@ test('the marked phone controls stay simple and clearly labelled', () => {
   const backup = source('src/components/BackupExportView.tsx');
   const print = source('src/components/PrintModal.tsx');
   const form = source('src/components/CoinFormModal.tsx');
+  const gridHeader = card.slice(
+    card.indexOf('/* Top Banner & Action */'),
+    card.indexOf('/* Center Coin Visual Header */')
+  );
   assert.match(card, /SKU #\{formatSKU\(coin\.catalogNumber \|\| coin\.id \|\| '1'\)\}/);
-  assert.equal(card.includes('title="Münze duplizieren / kopieren"'), false);
+  assert.equal(gridHeader.includes('onDuplicate'), false);
   assert.match(backup, /CSV-Mustervorlage/);
   assert.match(backup, /CSV-Vorlage herunterladen/);
   assert.match(backup, /import-success-message/);
