@@ -91,6 +91,18 @@ test('the app cannot restore example coins', () => {
   assert.match(storage, /function loadCoinsFromStorage\(\): Coin\[\] \{[\s\S]*return \[\];/);
 });
 
+test('delete-all is protected inside the top-right settings menu', () => {
+  const app = source('src/App.tsx');
+  const header = source('src/components/Header.tsx');
+  const backup = source('src/components/BackupExportView.tsx');
+  assert.match(app, /<Header[\s\S]*onClearAllCoins=\{handleClearAllCoins\}/);
+  assert.match(header, /Alle Münzen löschen/);
+  assert.match(header, /Wirklich alle \{totalCoins\} Münzen dauerhaft löschen\?/);
+  assert.match(header, /await onClearAllCoins\(\)/);
+  assert.equal(backup.includes('onClearAllCoins'), false);
+  assert.equal(backup.includes('Alle Münzen Löschen'), false);
+});
+
 test('the coin grid does not print Avers on the picture', () => {
   const card = source('src/components/CoinCard.tsx');
   assert.equal(card.includes('>Avers<'), false);

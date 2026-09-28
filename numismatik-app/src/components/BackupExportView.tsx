@@ -6,18 +6,15 @@ import { exportCoinsToCSV, downloadCSVFile, parseCSVToCoins, downloadCSVTemplate
 interface BackupExportViewProps {
   coins: Coin[];
   onImportCoins: (newCoins: Coin[], replaceExisting: boolean) => void;
-  onClearAllCoins?: () => void;
 }
 
 export const BackupExportView: React.FC<BackupExportViewProps> = ({
   coins,
-  onImportCoins,
-  onClearAllCoins
+  onImportCoins
 }) => {
   const [importErrors, setImportErrors] = useState<string[]>([]);
   const [importSuccessMsg, setImportSuccessMsg] = useState<string>('');
   const [replaceMode, setReplaceMode] = useState<boolean>(false);
-  const [showConfirmClear, setShowConfirmClear] = useState<boolean>(false);
   const [isImageImporting, setIsImageImporting] = useState<boolean>(false);
 
   // Compress image file to base64 data URI (max 800px, JPEG 85%)
@@ -368,53 +365,6 @@ export const BackupExportView: React.FC<BackupExportViewProps> = ({
         </div>
       )}
 
-      {/* Collection deletion */}
-      <div className="bg-[#181a22] border border-slate-800 rounded-2xl p-6 shadow-lg flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-        <div>
-          <h3 className="text-base font-bold font-serif text-slate-100 flex items-center gap-2">
-            Sammlung verwalten
-          </h3>
-          <p className="text-xs text-slate-400 mt-1">
-            Löschen Sie die aktuelle Sammlung ({coins.length} Münzen) vollständig.
-          </p>
-        </div>
-
-        <div className="flex flex-wrap items-center gap-2 shrink-0">
-          {onClearAllCoins && (
-            showConfirmClear ? (
-              <div className="flex items-center gap-2 bg-rose-950/90 border border-rose-600/80 rounded-xl p-1.5 animate-fadeIn">
-                <span className="text-[11px] text-rose-200 font-medium px-1">Wirklich alle {coins.length} löschen?</span>
-                <button
-                  onClick={() => {
-                    onClearAllCoins();
-                    setShowConfirmClear(false);
-                    setImportSuccessMsg('Alle Münzen wurden erfolgreich gelöscht.');
-                  }}
-                  className="px-3 py-1.5 text-xs font-bold text-white bg-rose-600 hover:bg-rose-500 rounded-lg shadow transition-all active:scale-95"
-                >
-                  Ja, Löschen
-                </button>
-                <button
-                  onClick={() => setShowConfirmClear(false)}
-                  className="px-2.5 py-1.5 text-xs font-medium text-stone-300 hover:text-white bg-stone-800 hover:bg-stone-700 rounded-lg transition-all"
-                >
-                  Abbrechen
-                </button>
-              </div>
-            ) : (
-              <button
-                onClick={() => {
-                  setShowConfirmClear(true);
-                }}
-                disabled={coins.length === 0}
-                className="px-4 py-2.5 text-xs font-semibold text-rose-300 hover:text-white bg-rose-950/70 hover:bg-rose-900 border border-rose-700/60 rounded-xl transition-all disabled:opacity-40 shrink-0 shadow-sm"
-              >
-                🗑️ Alle {coins.length} Münzen Löschen
-              </button>
-            )
-          )}
-        </div>
-      </div>
     </div>
   );
 };

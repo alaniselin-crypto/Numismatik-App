@@ -1213,6 +1213,7 @@ export default function App() {
         onOpenProModal={isIos && user ? () => { void handleOpenProModal(); } : undefined}
         onManualFetchWebhooks={() => handleFetchPendingWebhooks(true)}
         isFetchingWebhooks={isFetchingWebhooks}
+        onClearAllCoins={handleClearAllCoins}
       />
 
       {importToast && (
@@ -1295,7 +1296,6 @@ export default function App() {
           <BackupExportView
             coins={coins}
             onImportCoins={handleImportCoins}
-            onClearAllCoins={handleClearAllCoins}
           />
         )}
       </main>

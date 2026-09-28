@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { HelpCircle, Folder, ShoppingBag, Cloud, UserCheck, Settings, ChevronDown, LogIn, Crown , ListPlus, Sun, Moon, CloudUpload, CloudOff } from 'lucide-react';
+import { HelpCircle, Folder, ShoppingBag, Cloud, UserCheck, Settings, ChevronDown, LogIn, Crown, ListPlus, Sun, Moon, CloudUpload, CloudOff, Trash2 } from 'lucide-react';
 import { formatCurrency } from '../utils/storage';
 import { getStoredTheme, setTheme, applyTheme, type ThemeMode } from '../utils/theme';
 import { connectDrive, disconnectDrive, driveStatus, driveSupported } from '../utils/googleDrive';
@@ -21,6 +21,7 @@ interface HeaderProps {
   onManualFetchWebhooks?: () => void;
   isFetchingWebhooks?: boolean;
   onOpenDriveMigration?: () => void;
+  onClearAllCoins?: () => void | Promise<void>;
 }
 
 export const Header: React.FC<HeaderProps> = ({
@@ -36,10 +37,12 @@ export const Header: React.FC<HeaderProps> = ({
   onOpenProModal,
   onManualFetchWebhooks,
   isFetchingWebhooks,
-  onOpenDriveMigration
+  onOpenDriveMigration,
+  onClearAllCoins
 }) => {
   const { user } = useAuth();
   const [isSettingsOpen, setIsSettingsOpen] = useState<boolean>(false);
+  const [showClearConfirmation, setShowClearConfirmation] = useState<boolean>(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const [themeMode, setThemeMode] = useState<ThemeMode>(() => getStoredTheme());
   useEffect(() => {
@@ -73,6 +76,7 @@ export const Header: React.FC<HeaderProps> = ({
     const handleClickOutside = (event: MouseEvent) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
         setIsSettingsOpen(false);
+        setShowClearConfirmation(false);
       }
     };
     document.addEventListener('mousedown', handleClickOutside);
@@ -167,7 +171,11 @@ export const Header: React.FC<HeaderProps> = ({
 
           <div className="relative" ref={dropdownRef}>
             <button
-              onClick={() => { refreshDriveState(); setIsSettingsOpen(!isSettingsOpen); }}
+              onClick={() => {
+                refreshDriveState();
+                setIsSettingsOpen(!isSettingsOpen);
+                if (isSettingsOpen) setShowClearConfirmation(false);
+              }}
               className="flex items-center gap-1 px-2 py-1.5 text-[10px] sm:gap-1.5 sm:px-3 sm:py-2 sm:text-xs font-semibold text-amber-400 hover:text-amber-300 bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 hover:border-amber-500/50 rounded-lg transition-all shadow-sm shrink-0"
               title="Einstellungen & Werkzeuge öffnen"
             >
@@ -343,6 +351,51 @@ export const Header: React.FC<HeaderProps> = ({
                       <div className="text-[10px] text-stone-400">Nützliche Tipps zur Bedienung</div>
                     </div>
                   </button>
+                )}
+
+                {onClearAllCoins && (
+                  <div className="border-t border-[#3d2f26] mt-1 pt-1">
+                    {showClearConfirmation ? (
+                      <div className="m-2 rounded-xl border border-rose-700/70 bg-rose-950/70 p-3">
+                        <p className="text-xs font-semibold text-rose-200">
+                          Wirklich alle {totalCoins} Münzen dauerhaft löschen?
+                        </p>
+                        <div className="mt-2 flex gap-2">
+                          <button
+                            type="button"
+                            onClick={async () => {
+                              await onClearAllCoins();
+                              setShowClearConfirmation(false);
+                              setIsSettingsOpen(false);
+                            }}
+                            className="flex-1 rounded-lg bg-rose-600 px-3 py-2 text-xs font-bold text-white hover:bg-rose-500"
+                          >
+                            Ja, alle löschen
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => setShowClearConfirmation(false)}
+                            className="rounded-lg bg-stone-800 px-3 py-2 text-xs font-semibold text-stone-200 hover:bg-stone-700"
+                          >
+                            Abbrechen
+                          </button>
+                        </div>
+                      </div>
+                    ) : (
+                      <button
+                        type="button"
+                        onClick={() => setShowClearConfirmation(true)}
+                        disabled={totalCoins === 0}
+                        className="w-full flex items-center gap-2.5 px-3 py-2 text-xs text-rose-300 hover:bg-rose-950/60 transition-colors text-left disabled:cursor-not-allowed disabled:opacity-40"
+                      >
+                        <Trash2 className="w-4 h-4 shrink-0" />
+                        <div>
+                          <div className="font-medium">Alle Münzen löschen</div>
+                          <div className="text-[10px] text-stone-400">{totalCoins} Münzen dauerhaft entfernen</div>
+                        </div>
+                      </button>
+                    )}
+                  </div>
                 )}
 
               </div>
