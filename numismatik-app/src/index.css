@@ -278,6 +278,14 @@ html.light .coin-card-surface {
   border-color: #d8cfc1 !important;
 }
 
+/* Statusmeldungen bleiben grün und gut lesbar statt dunkelblau-grau. */
+html.light .sold-status-row,
+html.light .import-success-message {
+  background-color: #d1fae5 !important;
+  border-color: #6ee7b7 !important;
+  color: #065f46 !important;
+}
+
 /* Farbige Informationsflächen brauchen im hellen Modus dunkle Schrift. */
 html.light .bg-purple-950\/30 {
   background-color: #f3e8ff !important;

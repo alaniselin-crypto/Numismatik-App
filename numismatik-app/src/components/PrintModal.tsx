@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Capacitor } from '@capacitor/core';
-import { X, Printer, ExternalLink, Coins, Banknote } from 'lucide-react';
+import { X, Printer, Coins, Banknote } from 'lucide-react';
 import { Coin } from '../types';
 import { formatCurrency } from '../utils/storage';
 import { getRarityOption } from '../data/rarities';
@@ -312,14 +312,6 @@ export const PrintModal: React.FC<PrintModalProps> = ({ isOpen, coins, onClose }
             </div>
           </div>
 
-          <button
-            onClick={handleOpenNewWindowAndPrint}
-            disabled={isPrinting}
-            className="w-full sm:w-auto px-4 py-3 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 text-xs font-bold shadow-lg shadow-amber-950/40 flex items-center justify-center gap-2 transition-all"
-          >
-            <ExternalLink className="w-4 h-4" />
-            <span>In neuem Druck-Fenster öffnen / PDF</span>
-          </button>
         </div>
 
         {/* Modal Body - Document Preview */}
@@ -506,7 +498,7 @@ export const PrintModal: React.FC<PrintModalProps> = ({ isOpen, coins, onClose }
             <p className="mb-2 text-xs text-rose-300" role="alert">{printError}</p>
           )}
           <p className="hidden sm:block text-xs text-slate-400 mb-3">
-            Tipp: <strong className="text-amber-300 font-semibold">"In neuem Druck-Fenster öffnen"</strong> liefert das beste Druckergebnis und speichert als PDF.
+            Mit <strong className="text-amber-300 font-semibold">„Drucken / PDF“</strong> öffnen Sie den Druckdialog und können den Katalog als PDF speichern.
           </p>
           <div className="flex items-center gap-2">
             <button

@@ -1128,7 +1128,7 @@ export const CoinFormModal: React.FC<CoinFormModalProps> = ({
 
                   {/* Status: Verkauft */}
                   <div className="pt-2 border-t border-purple-500/20">
-                    <div className="flex items-center space-x-3 bg-emerald-950/30 p-3 rounded-xl border border-emerald-500/30">
+                    <div className="sold-status-row flex items-center space-x-3 bg-emerald-950/30 p-3 rounded-xl border border-emerald-500/30">
                       <label className="relative inline-flex items-center cursor-pointer">
                         <input
                           type="checkbox"

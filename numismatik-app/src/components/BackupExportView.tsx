@@ -199,13 +199,19 @@ export const BackupExportView: React.FC<BackupExportViewProps> = ({
           </p>
         </div>
 
-        <button
-          onClick={downloadCSVTemplate}
-          className="flex items-center justify-center gap-2 px-4 py-2.5 text-xs font-semibold text-amber-300 hover:text-amber-200 bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 rounded-xl transition-all shadow-sm shrink-0"
-        >
-          <FileText className="w-4 h-4 text-amber-400" />
-          <span>Muster-CSV Vorlage Herunterladen</span>
-        </button>
+        <div className="sm:max-w-xs">
+          <h3 className="text-sm font-bold font-serif text-slate-100">CSV-Mustervorlage</h3>
+          <p className="text-[11px] text-slate-400 mt-0.5 mb-2">
+            Vorlage mit Beispieldaten zum Eintragen Ihrer Münzen.
+          </p>
+          <button
+            onClick={downloadCSVTemplate}
+            className="flex items-center justify-center gap-2 px-4 py-2.5 text-xs font-semibold text-amber-300 hover:text-amber-200 bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 rounded-xl transition-all shadow-sm shrink-0"
+          >
+            <FileText className="w-4 h-4 text-amber-400" />
+            <span>CSV-Vorlage herunterladen</span>
+          </button>
+        </div>
       </div>
 
       {/* Main Grid: Export & Import Cards */}
@@ -345,7 +351,7 @@ export const BackupExportView: React.FC<BackupExportViewProps> = ({
 
       {/* Notifications / Feedback Messages */}
       {importSuccessMsg && (
-        <div className="p-4 rounded-xl bg-emerald-950/60 border border-emerald-500/40 text-emerald-300 text-xs flex items-center gap-3">
+        <div className="import-success-message p-4 rounded-xl bg-emerald-950/60 border border-emerald-500/40 text-emerald-300 text-xs flex items-center gap-3">
           <CheckCircle2 className="w-5 h-5 text-emerald-400 shrink-0" />
           <span>{importSuccessMsg}</span>
         </div>

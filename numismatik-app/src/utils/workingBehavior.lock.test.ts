@@ -82,6 +82,22 @@ test('light mode covers every dark app surface and translucent card', () => {
   assert.match(css, /\.text-purple-200,[\s\S]*\.text-purple-400 \{[\s\S]*color: #6b21a8 !important;/);
   assert.match(css, /\.text-blue-200,[\s\S]*\.text-blue-400 \{[\s\S]*color: #1d4ed8 !important;/);
   assert.match(css, /\.text-emerald-200,[\s\S]*\.text-emerald-400 \{[\s\S]*color: #047857 !important;/);
+  assert.match(css, /\.sold-status-row,[\s\S]*\.import-success-message \{[\s\S]*background-color: #d1fae5 !important;[\s\S]*color: #065f46 !important;/);
+});
+
+test('the marked phone controls stay simple and clearly labelled', () => {
+  const card = source('src/components/CoinCard.tsx');
+  const backup = source('src/components/BackupExportView.tsx');
+  const print = source('src/components/PrintModal.tsx');
+  const form = source('src/components/CoinFormModal.tsx');
+  assert.match(card, /SKU #\{formatSKU\(coin\.catalogNumber \|\| coin\.id \|\| '1'\)\}/);
+  assert.equal(card.includes('title="Münze duplizieren / kopieren"'), false);
+  assert.match(backup, /CSV-Mustervorlage/);
+  assert.match(backup, /CSV-Vorlage herunterladen/);
+  assert.match(backup, /import-success-message/);
+  assert.match(form, /sold-status-row/);
+  assert.equal(print.includes('In neuem Druck-Fenster öffnen / PDF'), false);
+  assert.match(print, /Drucken \/ PDF/);
 });
 
 test('small iPhone text stays readable and sales value stays optional', () => {

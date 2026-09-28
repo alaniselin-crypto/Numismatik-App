@@ -198,7 +198,7 @@ export const CoinCard: React.FC<CoinCardProps> = ({
         <div className="flex flex-wrap items-start justify-between gap-2 mb-2 sm:mb-3 sm:flex-nowrap sm:items-center">
           <div className="flex min-w-0 items-center gap-1.5 flex-wrap">
             <span className="inline-flex items-center gap-0.5 px-2 py-0.5 rounded bg-amber-500/15 border border-amber-500/30 text-amber-300 font-mono text-[11px] font-bold" title="SKU">
-              #{formatSKU(coin.catalogNumber || coin.id || '1')}
+              SKU #{formatSKU(coin.catalogNumber || coin.id || '1')}
             </span>
             <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[11px] font-bold border ${cond.color}`}>
               {cond.label}
@@ -206,16 +206,6 @@ export const CoinCard: React.FC<CoinCardProps> = ({
           </div>
 
           <div className="flex shrink-0 items-center gap-1">
-            {onDuplicate && (
-              <button
-                onClick={() => onDuplicate(coin)}
-                className={`${isIos ? 'flex items-center gap-1.5 px-2.5 py-1 sm:py-1.5' : 'p-1.5'} rounded-lg bg-[#1a1412]/60 hover:bg-[#3a2c24] text-stone-400 hover:text-amber-300 transition-all`}
-                title="Münze duplizieren / kopieren"
-              >
-                <Copy className="w-4 h-4" />
-                {isIos && <span className="text-xs font-semibold">Duplizieren</span>}
-              </button>
-            )}
             <button
               onClick={() => onToggleFavorite(coin.id)}
               className="p-1.5 rounded-lg bg-[#1a1412]/60 hover:bg-[#3a2c24] text-stone-400 hover:text-amber-400 transition-all"
