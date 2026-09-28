@@ -66,6 +66,15 @@ test('phone layout keeps charts and the coin list readable', () => {
   assert.match(source('src/components/CoinList.tsx'), /className="collection-table /);
 });
 
+test('light mode covers every dark app surface and translucent card', () => {
+  const css = source('src/index.css');
+  assert.match(css, /html\.light #root > div,[\s\S]*background-color: #f1ebe0 !important;/);
+  assert.match(css, /html\.light \[class\*="bg-\[#0"\],[\s\S]*html\.light \[class\*="bg-\[#3"\]/);
+  assert.match(css, /\.bg-slate-950\\\/85,[\s\S]*\.bg-slate-900\\\/90/);
+  assert.match(css, /\.bg-stone-800\\\/50,[\s\S]*\.bg-stone-950\\\/85/);
+  assert.match(css, /html\.light \[class\*="border-\[#"\],[\s\S]*border-color: #d8cfc1 !important;/);
+});
+
 test('small iPhone text stays readable and sales value stays optional', () => {
   const css = source('src/index.css');
   const form = source('src/components/CoinFormModal.tsx');
