@@ -68,11 +68,20 @@ test('phone layout keeps charts and the coin list readable', () => {
 
 test('light mode covers every dark app surface and translucent card', () => {
   const css = source('src/index.css');
+  const dashboard = source('src/components/Dashboard.tsx');
+  const card = source('src/components/CoinCard.tsx');
   assert.match(css, /html\.light #root > div,[\s\S]*background-color: #f1ebe0 !important;/);
   assert.match(css, /html\.light \[class\*="bg-\[#0"\],[\s\S]*html\.light \[class\*="bg-\[#3"\]/);
   assert.match(css, /\.bg-slate-950\\\/85,[\s\S]*\.bg-slate-900\\\/90/);
   assert.match(css, /\.bg-stone-800\\\/50,[\s\S]*\.bg-stone-950\\\/85/);
   assert.match(css, /html\.light \[class\*="border-\[#"\],[\s\S]*border-color: #d8cfc1 !important;/);
+  assert.match(dashboard, /dashboard-welcome/);
+  assert.match(card, /coin-card-surface/);
+  assert.match(css, /\.dashboard-welcome,[\s\S]*\.coin-card-surface \{[\s\S]*background-image: none !important;/);
+  assert.match(css, /\.bg-purple-950\\\/30 \{[\s\S]*background-color: #f3e8ff !important;/);
+  assert.match(css, /\.text-purple-200,[\s\S]*\.text-purple-400 \{[\s\S]*color: #6b21a8 !important;/);
+  assert.match(css, /\.text-blue-200,[\s\S]*\.text-blue-400 \{[\s\S]*color: #1d4ed8 !important;/);
+  assert.match(css, /\.text-emerald-200,[\s\S]*\.text-emerald-400 \{[\s\S]*color: #047857 !important;/);
 });
 
 test('small iPhone text stays readable and sales value stays optional', () => {

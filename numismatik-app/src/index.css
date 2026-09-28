@@ -270,6 +270,28 @@ html.light .bg-stone-950\/40, html.light .bg-stone-950\/85 {
   background-color: rgba(239, 233, 221, 0.96) !important;
 }
 
+/* Tailwind-Verläufe behalten sonst ihr dunkles Hintergrundbild im hellen Modus. */
+html.light .dashboard-welcome,
+html.light .coin-card-surface {
+  background-image: none !important;
+  background-color: #faf7f0 !important;
+  border-color: #d8cfc1 !important;
+}
+
+/* Farbige Informationsflächen brauchen im hellen Modus dunkle Schrift. */
+html.light .bg-purple-950\/30 {
+  background-color: #f3e8ff !important;
+}
+html.light .border-purple-500\/20,
+html.light .border-purple-500\/30,
+html.light .border-purple-500\/40 {
+  border-color: #c4b5fd !important;
+}
+html.light .border-blue-500\/20,
+html.light .border-blue-500\/30 {
+  border-color: #93c5fd !important;
+}
+
 /* Auch halbtransparente und bisher nicht einzeln erfasste Ränder aufhellen. */
 html.light [class*="border-[#"],
 html.light .border-slate-300\/50, html.light .border-slate-400\/30,
@@ -298,7 +320,13 @@ html.light .text-amber-300, html.light .text-amber-400, html.light .text-amber-5
 html.light .text-amber-200, html.light .text-amber-100 {
   color: #92400e !important;
 }
-html.light .text-emerald-300, html.light .text-emerald-400 {
+html.light .text-purple-200, html.light .text-purple-300, html.light .text-purple-400 {
+  color: #6b21a8 !important;
+}
+html.light .text-blue-200, html.light .text-blue-300, html.light .text-blue-400 {
+  color: #1d4ed8 !important;
+}
+html.light .text-emerald-200, html.light .text-emerald-300, html.light .text-emerald-400 {
   color: #047857 !important;
 }
 html.light .text-rose-300, html.light .text-rose-400 {

@@ -192,7 +192,7 @@ export const CoinCard: React.FC<CoinCardProps> = ({
   }
 
   return (
-    <div className="group relative w-full min-w-0 max-w-full overflow-hidden bg-gradient-to-b from-[#271e19] to-[#1e1713] hover:from-[#2e231d] hover:to-[#221a15] border border-[#3e2e25] hover:border-amber-500/50 rounded-2xl px-3 py-2 sm:p-4 transition-all duration-300 shadow-md hover:shadow-xl hover:shadow-amber-950/40 flex flex-col justify-between">
+    <div className="coin-card-surface group relative w-full min-w-0 max-w-full overflow-hidden bg-gradient-to-b from-[#271e19] to-[#1e1713] hover:from-[#2e231d] hover:to-[#221a15] border border-[#3e2e25] hover:border-amber-500/50 rounded-2xl px-3 py-2 sm:p-4 transition-all duration-300 shadow-md hover:shadow-xl hover:shadow-amber-950/40 flex flex-col justify-between">
         {/* Top Banner & Action */}
       <div>
         <div className="flex flex-wrap items-start justify-between gap-2 mb-2 sm:mb-3 sm:flex-nowrap sm:items-center">

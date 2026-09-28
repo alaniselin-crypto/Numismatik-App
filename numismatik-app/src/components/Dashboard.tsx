@@ -71,7 +71,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
   return (
     <div className="space-y-8 animate-fadeIn pb-12 max-w-full overflow-x-hidden">
       {/* Welcome Banner */}
-      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-[#2a1f1a] via-[#241c18] to-[#1a1412] p-5 sm:p-6 border border-amber-900/40 shadow-xl">
+      <div className="dashboard-welcome relative overflow-hidden rounded-2xl bg-gradient-to-r from-[#2a1f1a] via-[#241c18] to-[#1a1412] p-5 sm:p-6 border border-amber-900/40 shadow-xl">
         <div className="absolute top-0 right-0 -mt-8 -mr-8 w-64 h-64 rounded-full bg-amber-500/10 blur-3xl pointer-events-none" />
 
         <div className="relative z-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
