@@ -1004,7 +1004,15 @@ export const CoinFormModal: React.FC<CoinFormModalProps> = ({
                       onChange={e => setFormData({ ...formData, isForSale: e.target.checked })}
                       className="sr-only peer"
                     />
-                    <div className="w-9 h-5 bg-slate-800 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-purple-600"></div>
+                    <div className={`relative w-9 h-5 rounded-full transition-colors ${
+                      formData.isForSale ? 'bg-purple-600' : 'bg-slate-800'
+                    }`}>
+                      <span className={`absolute top-[2px] left-[2px] h-4 w-4 rounded-full border bg-white transition-transform ${
+                        formData.isForSale
+                          ? 'translate-x-4 border-white'
+                          : 'translate-x-0 border-slate-300'
+                      }`} />
+                    </div>
                   </label>
                   <span className="text-xs font-semibold text-purple-200 leading-tight break-words">
                     Münze steht zum Verkauf / auf Verkaufsplattform
@@ -1136,10 +1144,20 @@ export const CoinFormModal: React.FC<CoinFormModalProps> = ({
                           onChange={e => setFormData({ ...formData, isSold: e.target.checked })}
                           className="sr-only peer"
                         />
-                        <div className="w-9 h-5 bg-slate-800 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-emerald-600"></div>
+                        <div className={`relative w-9 h-5 rounded-full transition-colors ${
+                          formData.isSold ? 'bg-emerald-600' : 'bg-slate-800'
+                        }`}>
+                          <span className={`absolute top-[2px] left-[2px] h-4 w-4 rounded-full border bg-white transition-transform ${
+                            formData.isSold
+                              ? 'translate-x-4 border-white'
+                              : 'translate-x-0 border-slate-300'
+                          }`} />
+                        </div>
                       </label>
                       <span className="text-xs font-bold text-emerald-300">
-                        Münze wurde bereits verkauft ✅
+                        {formData.isSold
+                          ? 'Münze wurde bereits verkauft ✅'
+                          : 'Münze ist noch nicht verkauft'}
                       </span>
                     </div>
 

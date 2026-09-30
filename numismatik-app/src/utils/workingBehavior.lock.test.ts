@@ -101,6 +101,10 @@ test('the marked phone controls stay simple and clearly labelled', () => {
   assert.match(backup, /CSV-Vorlage herunterladen/);
   assert.match(backup, /import-success-message/);
   assert.match(form, /sold-status-row/);
+  assert.match(form, /formData\.isForSale \? 'bg-purple-600' : 'bg-slate-800'/);
+  assert.match(form, /formData\.isSold \? 'bg-emerald-600' : 'bg-slate-800'/);
+  assert.match(form, /formData\.isSold[\s\S]*Münze wurde bereits verkauft ✅[\s\S]*Münze ist noch nicht verkauft/);
+  assert.equal(form.includes('peer-checked:after:translate-x-full'), false);
   assert.equal(print.includes('In neuem Druck-Fenster öffnen / PDF'), false);
   assert.match(print, /Drucken \/ PDF/);
 });
