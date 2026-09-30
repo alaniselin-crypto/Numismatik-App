@@ -228,11 +228,11 @@ export const CoinDetailModal: React.FC<CoinDetailModalProps> = ({
 
               {/* Sales & Platforms Block */}
               {(coin.isForSale || coin.isSold) && (
-                <div className="p-4 rounded-xl bg-purple-950/30 border border-purple-500/30 space-y-3">
+                <div className="p-4 rounded-xl bg-amber-950/30 border border-amber-500/30 space-y-3">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center space-x-2">
-                      <ShoppingBag className="w-4 h-4 text-purple-400" />
-                      <h3 className="text-xs font-bold text-purple-300 uppercase tracking-wider">
+                      <ShoppingBag className="w-4 h-4 text-amber-400" />
+                      <h3 className="text-xs font-bold text-amber-300 uppercase tracking-wider">
                         Verkaufs- & Plattformstatus
                       </h3>
                     </div>
@@ -242,8 +242,8 @@ export const CoinDetailModal: React.FC<CoinDetailModalProps> = ({
                         Erfolgreich Verkauft
                       </span>
                     ) : (
-                      <span className="px-2.5 py-0.5 rounded-full bg-purple-500/20 text-purple-300 border border-purple-500/40 text-xs font-bold flex items-center gap-1">
-                        <Tag className="w-3.5 h-3.5 text-purple-400" />
+                      <span className="px-2.5 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/40 text-xs font-bold flex items-center gap-1">
+                        <Tag className="w-3.5 h-3.5 text-amber-400" />
                         Aktiv Angeboten
                       </span>
                     )}
@@ -251,19 +251,19 @@ export const CoinDetailModal: React.FC<CoinDetailModalProps> = ({
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs sm:text-sm">
                     {coin.listingPlatform && (
-                      <div className="p-3 rounded-xl bg-slate-900/80 border border-purple-500/20 flex justify-between items-center">
-                        <span className="text-purple-300 font-semibold flex items-center gap-1">
-                          <Tag className="w-3.5 h-3.5 text-purple-400" />
+                      <div className="p-3 rounded-xl bg-slate-900/80 border border-amber-500/20 flex justify-between items-center">
+                        <span className="text-amber-300 font-semibold flex items-center gap-1">
+                          <Tag className="w-3.5 h-3.5 text-amber-400" />
                           Plattform:
                         </span>
-                        <span className="font-bold text-purple-200">{coin.listingPlatform}</span>
+                        <span className="font-bold text-amber-200">{coin.listingPlatform}</span>
                       </div>
                     )}
 
                     {coin.listingPrice > 0 && (
-                      <div className="p-3 rounded-xl bg-slate-900/80 border border-purple-500/20 flex justify-between items-center">
-                        <span className="text-purple-300 font-semibold">Einstellpreis:</span>
-                        <span className="font-mono font-bold text-purple-200">{formatCurrency(coin.listingPrice)}</span>
+                      <div className="p-3 rounded-xl bg-slate-900/80 border border-amber-500/20 flex justify-between items-center">
+                        <span className="text-amber-300 font-semibold">Einstellpreis:</span>
+                        <span className="font-mono font-bold text-amber-200">{formatCurrency(coin.listingPrice)}</span>
                       </div>
                     )}
 
@@ -288,7 +288,7 @@ export const CoinDetailModal: React.FC<CoinDetailModalProps> = ({
                     )}
 
                     {coin.listingUrl && (
-                      <div className="p-3 rounded-xl bg-slate-900/80 border border-purple-500/20 sm:col-span-2 flex justify-between items-center">
+                      <div className="p-3 rounded-xl bg-slate-900/80 border border-amber-500/20 sm:col-span-2 flex justify-between items-center">
                         <span className="text-slate-400">Inserat Link:</span>
                         <a
                           href={coin.listingUrl}
@@ -337,7 +337,7 @@ export const CoinDetailModal: React.FC<CoinDetailModalProps> = ({
                 {coin.rarity && (
                   <div className="p-3 rounded-xl bg-slate-900/60 border border-slate-800/80 flex justify-between items-center sm:col-span-2">
                     <span className="text-slate-400 flex items-center gap-1">
-                      <Crown className="w-3.5 h-3.5 text-purple-400" />
+                      <Crown className="w-3.5 h-3.5 text-amber-400" />
                       Seltenheitsgrad (Rarity):
                     </span>
                     {rarityOpt ? (

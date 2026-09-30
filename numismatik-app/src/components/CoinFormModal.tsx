@@ -664,8 +664,8 @@ export const CoinFormModal: React.FC<CoinFormModalProps> = ({
                 {/* Rarity Selector (Dropdown) */}
                 <div className="pt-2 border-t border-slate-800">
                   <div className="flex items-center justify-between mb-1.5">
-                    <label className="text-xs font-semibold text-purple-300 flex items-center gap-1.5">
-                      <Crown className="w-4 h-4 text-purple-400" />
+                    <label className="text-xs font-semibold text-amber-300 flex items-center gap-1.5">
+                      <Crown className="w-4 h-4 text-amber-400" />
                       <span>Seltenheitsgrad (Rarity)</span>
                     </label>
                   </div>
@@ -673,7 +673,7 @@ export const CoinFormModal: React.FC<CoinFormModalProps> = ({
                   <select
                     value={formData.rarity}
                     onChange={e => setFormData({ ...formData, rarity: e.target.value })}
-                    className="w-full px-3.5 py-2.5 rounded-xl bg-slate-900 border border-slate-800 text-sm text-purple-300 font-semibold focus:outline-none focus:ring-2 focus:ring-purple-500/50 cursor-pointer"
+                    className="w-full px-3.5 py-2.5 rounded-xl bg-slate-900 border border-slate-800 text-sm text-amber-300 font-semibold focus:outline-none focus:ring-2 focus:ring-amber-500/50 cursor-pointer"
                   >
                     <option value="" disabled>-- Seltenheit auswählen --</option>
                     {RARITY_OPTIONS.map(opt => (
@@ -695,7 +695,7 @@ export const CoinFormModal: React.FC<CoinFormModalProps> = ({
                     type="button"
                     onClick={handleAiGenerate}
                     disabled={isAiGenerating}
-                    className="px-3 py-1.5 rounded-lg bg-gradient-to-r from-purple-600 via-purple-500 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-bold text-xs flex items-center justify-center gap-1.5 shadow-md hover:shadow-purple-500/30 transition-all disabled:opacity-50 self-start sm:self-auto"
+                    className="px-3 py-1.5 rounded-lg bg-gradient-to-r from-amber-600 via-amber-500 to-orange-600 hover:from-amber-500 hover:to-orange-500 text-white font-bold text-xs flex items-center justify-center gap-1.5 shadow-md hover:shadow-amber-500/30 transition-all disabled:opacity-50 self-start sm:self-auto"
                   >
                     {isAiGenerating ? (
                       <>
@@ -974,11 +974,11 @@ export const CoinFormModal: React.FC<CoinFormModalProps> = ({
             </div>
 
             {/* Sales & Platforms Section */}
-            <div className="mt-4 p-3.5 sm:p-4 rounded-2xl bg-purple-950/30 border border-purple-500/30 space-y-3">
+            <div className="mt-4 p-3.5 sm:p-4 rounded-2xl bg-amber-950/30 border border-amber-500/30 space-y-3">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                 <div className="flex items-center space-x-2">
-                  <ShoppingBag className="w-4 h-4 text-purple-400 shrink-0" />
-                  <h4 className="text-xs font-bold text-purple-300 uppercase tracking-wider">
+                  <ShoppingBag className="w-4 h-4 text-amber-400 shrink-0" />
+                  <h4 className="text-xs font-bold text-amber-300 uppercase tracking-wider">
                     Verkauf & Verkaufsplattform
                   </h4>
                 </div>
@@ -1005,7 +1005,7 @@ export const CoinFormModal: React.FC<CoinFormModalProps> = ({
                       className="sr-only peer"
                     />
                     <div className={`relative w-9 h-5 rounded-full transition-colors ${
-                      formData.isForSale ? 'bg-purple-600' : 'bg-slate-800'
+                      formData.isForSale ? 'bg-amber-600' : 'bg-slate-800'
                     }`}>
                       <span className={`absolute top-[2px] left-[2px] h-4 w-4 rounded-full border bg-white transition-transform ${
                         formData.isForSale
@@ -1014,12 +1014,12 @@ export const CoinFormModal: React.FC<CoinFormModalProps> = ({
                       }`} />
                     </div>
                   </label>
-                  <span className="text-xs font-semibold text-purple-200 leading-tight break-words">
+                  <span className="text-xs font-semibold text-amber-200 leading-tight break-words">
                     Münze steht zum Verkauf / auf Verkaufsplattform
                   </span>
                 </div>
                 {formData.isForSale && (
-                  <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-purple-500/20 text-purple-300 border border-purple-500/40 shrink-0 self-start sm:self-auto">
+                  <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/40 shrink-0 self-start sm:self-auto">
                     Aktiv Angeboten
                   </span>
                 )}
@@ -1030,7 +1030,7 @@ export const CoinFormModal: React.FC<CoinFormModalProps> = ({
                   {/* Platform Selection */}
                   <div className="space-y-1.5">
                     <div className="flex items-center justify-between">
-                      <label className="block text-xs font-medium text-purple-200">
+                      <label className="block text-xs font-medium text-amber-200">
                         Verkaufsplattform (Eigener Kanal) *
                       </label>
                       <span className="text-[10px] text-slate-400">z.B. Ricardo, eBay, Tutti</span>
@@ -1047,7 +1047,7 @@ export const CoinFormModal: React.FC<CoinFormModalProps> = ({
                               setFormData({ ...formData, listingPlatform: e.target.value });
                             }
                           }}
-                          className="w-full px-3 py-2.5 rounded-xl bg-slate-900 border border-slate-700 text-sm text-purple-200 focus:outline-none focus:ring-2 focus:ring-purple-500/50 cursor-pointer"
+                          className="w-full px-3 py-2.5 rounded-xl bg-slate-900 border border-slate-700 text-sm text-amber-200 focus:outline-none focus:ring-2 focus:ring-amber-500/50 cursor-pointer"
                         >
                           <option value="" disabled>-- Dropdown: Plattform auswählen --</option>
                           {availablePlatforms.map(p => (
@@ -1067,7 +1067,7 @@ export const CoinFormModal: React.FC<CoinFormModalProps> = ({
                           value={formData.listingPlatform}
                           onChange={e => setFormData({ ...formData, listingPlatform: e.target.value })}
                           placeholder="oder Plattform frei eintippen..."
-                          className="w-full px-3.5 py-2.5 rounded-xl bg-slate-900 border border-slate-700 text-sm text-purple-100 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-purple-500/50"
+                          className="w-full px-3.5 py-2.5 rounded-xl bg-slate-900 border border-slate-700 text-sm text-amber-100 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-amber-500/50"
                         />
                       </div>
                     </div>
@@ -1083,7 +1083,7 @@ export const CoinFormModal: React.FC<CoinFormModalProps> = ({
                             onClick={() => setFormData({ ...formData, listingPlatform: p })}
                             className={`px-2 py-0.5 text-[10px] rounded border transition-all ${
                               formData.listingPlatform === p
-                                ? 'bg-purple-500/30 text-purple-200 border-purple-500/60 font-bold'
+                                ? 'bg-amber-500/30 text-amber-200 border-amber-500/60 font-bold'
                                 : 'bg-slate-800/80 text-slate-300 border-slate-700 hover:bg-slate-700'
                             }`}
                           >
@@ -1115,7 +1115,7 @@ export const CoinFormModal: React.FC<CoinFormModalProps> = ({
                             setFormData({ ...formData, listingPrice: isNaN(parsed) ? 0 : parsed });
                           }
                         }}
-                        className="w-full px-3.5 py-2.5 rounded-xl bg-slate-900 border border-slate-700 text-sm font-mono text-purple-200 font-semibold focus:outline-none focus:ring-2 focus:ring-purple-500/50"
+                        className="w-full px-3.5 py-2.5 rounded-xl bg-slate-900 border border-slate-700 text-sm font-mono text-amber-200 font-semibold focus:outline-none focus:ring-2 focus:ring-amber-500/50"
                       />
                     </div>
 
@@ -1129,13 +1129,13 @@ export const CoinFormModal: React.FC<CoinFormModalProps> = ({
                         value={formData.listingUrl}
                         onChange={e => setFormData({ ...formData, listingUrl: e.target.value })}
                         placeholder="https://www.ricardo.ch/de/a/..."
-                        className="w-full px-3.5 py-2.5 rounded-xl bg-slate-900 border border-slate-700 text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-purple-500/50"
+                        className="w-full px-3.5 py-2.5 rounded-xl bg-slate-900 border border-slate-700 text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-amber-500/50"
                       />
                     </div>
                   </div>
 
                   {/* Status: Verkauft */}
-                  <div className="pt-2 border-t border-purple-500/20">
+                  <div className="pt-2 border-t border-amber-500/20">
                     <div className="sold-status-row flex items-center space-x-3 bg-emerald-950/30 p-3 rounded-xl border border-emerald-500/30">
                       <label className="relative inline-flex items-center cursor-pointer">
                         <input
@@ -1338,7 +1338,7 @@ export const CoinFormModal: React.FC<CoinFormModalProps> = ({
                     type="button"
                     onClick={handleAiNotesGenerate}
                     disabled={isAiNotesGenerating}
-                    className="px-3 py-1.5 rounded-lg bg-gradient-to-r from-purple-600 via-purple-500 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-bold text-xs flex items-center justify-center gap-1.5 shadow-md hover:shadow-purple-500/30 transition-all disabled:opacity-50 self-start sm:self-auto"
+                    className="px-3 py-1.5 rounded-lg bg-gradient-to-r from-amber-600 via-amber-500 to-orange-600 hover:from-amber-500 hover:to-orange-500 text-white font-bold text-xs flex items-center justify-center gap-1.5 shadow-md hover:shadow-amber-500/30 transition-all disabled:opacity-50 self-start sm:self-auto"
                   >
                     {isAiNotesGenerating ? (
                       <>

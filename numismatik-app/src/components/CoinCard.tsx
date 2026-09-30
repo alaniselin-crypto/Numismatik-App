@@ -308,8 +308,8 @@ export const CoinCard: React.FC<CoinCardProps> = ({
               <span>Verkauft ({formatCurrency(coin.soldPrice ?? coin.currentValue)})</span>
             </span>
           ) : coin.isForSale ? (
-            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-purple-500/20 text-purple-300 border border-purple-500/40 font-semibold" title={coin.listingUrl ? 'Zum Angebot verlinkt' : ''}>
-              <Tag className="w-3 h-3 text-purple-400 shrink-0" />
+            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/40 font-semibold" title={coin.listingUrl ? 'Zum Angebot verlinkt' : ''}>
+              <Tag className="w-3 h-3 text-amber-400 shrink-0" />
               <span>{coin.listingPlatform || 'Eingestellt'}{coin.listingPrice ? `: ${formatCurrency(coin.listingPrice)}` : ''}</span>
             </span>
           ) : null}

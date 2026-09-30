@@ -340,8 +340,8 @@ export const CoinList: React.FC<CoinListProps> = ({
             onClick={() => setFilter(prev => ({ ...prev, onlyForSale: !prev.onlyForSale }))}
             className={`flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold border transition-all ${
               filter.onlyForSale
-                ? 'bg-purple-500 text-slate-950 border-purple-400'
-                : 'bg-slate-900 text-purple-300 border-slate-800 hover:border-purple-500/40'
+                ? 'bg-amber-500 text-slate-950 border-amber-400'
+                : 'bg-slate-900 text-amber-300 border-slate-800 hover:border-amber-500/40'
             }`}
           >
             <span>🛒 Steht zum Verkauf</span>
@@ -419,7 +419,7 @@ export const CoinList: React.FC<CoinListProps> = ({
 
             <div>
               <div className="flex items-center justify-between mb-1">
-                <label className="text-xs font-medium text-purple-300">
+                <label className="text-xs font-medium text-amber-300">
                   Verkaufsplattform
                 </label>
                 {onOpenPlatformManager && (
@@ -436,7 +436,7 @@ export const CoinList: React.FC<CoinListProps> = ({
               <select
                 value={filter.listingPlatform}
                 onChange={e => setFilter({ ...filter, listingPlatform: e.target.value })}
-                className="w-full px-3 py-2 rounded-lg bg-[#181a22] border border-slate-800 text-xs text-purple-200 focus:outline-none"
+                className="w-full px-3 py-2 rounded-lg bg-[#181a22] border border-slate-800 text-xs text-amber-200 focus:outline-none"
               >
                 <option value="">Alle Plattformen</option>
                 {uniquePlatforms.map(p => (

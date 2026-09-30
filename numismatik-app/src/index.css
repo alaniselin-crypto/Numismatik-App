@@ -292,14 +292,10 @@ html.light .import-success-message {
   color: #065f46 !important;
 }
 
-/* Farbige Informationsflächen brauchen im hellen Modus dunkle Schrift. */
-html.light .bg-purple-950\/30 {
-  background-color: #f3e8ff !important;
-}
-html.light .border-purple-500\/20,
-html.light .border-purple-500\/30,
-html.light .border-purple-500\/40 {
-  border-color: #c4b5fd !important;
+/* Verkaufsflächen bleiben neutral hell und nutzen nur Gold-/Braun-Akzente. */
+html.light .bg-amber-950\/20,
+html.light .bg-amber-950\/30 {
+  background-color: #faf7f0 !important;
 }
 
 /* Auch halbtransparente und bisher nicht einzeln erfasste Ränder aufhellen. */
@@ -329,9 +325,6 @@ html.light .text-amber-300, html.light .text-amber-400, html.light .text-amber-5
 }
 html.light .text-amber-200, html.light .text-amber-100 {
   color: #92400e !important;
-}
-html.light .text-purple-200, html.light .text-purple-300, html.light .text-purple-400 {
-  color: #6b21a8 !important;
 }
 html.light .text-emerald-200, html.light .text-emerald-300, html.light .text-emerald-400 {
   color: #047857 !important;

@@ -230,9 +230,9 @@ export const Header: React.FC<HeaderProps> = ({
                       setIsSettingsOpen(false);
                       onOpenPlatformManager();
                     }}
-                    className="w-full flex items-center gap-2.5 px-3 py-2 text-xs text-stone-200 hover:bg-[#322722] hover:text-purple-300 transition-colors text-left"
+                    className="w-full flex items-center gap-2.5 px-3 py-2 text-xs text-stone-200 hover:bg-[#322722] hover:text-amber-300 transition-colors text-left"
                   >
-                    <ShoppingBag className="w-4 h-4 text-purple-400 shrink-0" />
+                    <ShoppingBag className="w-4 h-4 text-amber-400 shrink-0" />
                     <div>
                       <div className="font-medium">Verkaufsplattformen</div>
                       <div className="text-[10px] text-stone-400">Ricardo, eBay, Tutti usw.</div>

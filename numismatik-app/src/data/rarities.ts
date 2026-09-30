@@ -22,10 +22,10 @@ export const RARITY_OPTIONS: RarityOption[] = [
     code: 'B',
     label: 'Nicht häufig',
     fullLabel: 'B - Nicht häufig',
-    badgeBgClass: 'bg-fuchsia-500/20',
-    badgeTextClass: 'text-fuchsia-300',
-    badgeBorderClass: 'border-fuchsia-500/40',
-    pillBg: 'bg-fuchsia-600 text-white font-semibold'
+    badgeBgClass: 'bg-orange-500/20',
+    badgeTextClass: 'text-orange-300',
+    badgeBorderClass: 'border-orange-500/40',
+    pillBg: 'bg-orange-600 text-white font-semibold'
   },
   {
     code: 'C',
@@ -58,10 +58,10 @@ export const RARITY_OPTIONS: RarityOption[] = [
     code: 'RRR',
     label: 'Äusserst selten',
     fullLabel: 'RRR - Äusserst selten',
-    badgeBgClass: 'bg-purple-600/30',
-    badgeTextClass: 'text-purple-200',
-    badgeBorderClass: 'border-purple-500/50',
-    pillBg: 'bg-purple-800 text-white font-semibold'
+    badgeBgClass: 'bg-amber-600/30',
+    badgeTextClass: 'text-amber-200',
+    badgeBorderClass: 'border-amber-500/50',
+    pillBg: 'bg-amber-800 text-white font-semibold'
   }
 ];
 

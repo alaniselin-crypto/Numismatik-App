@@ -78,14 +78,13 @@ test('light mode covers every dark app surface and translucent card', () => {
   assert.match(dashboard, /dashboard-welcome/);
   assert.match(card, /coin-card-surface/);
   assert.match(css, /\.dashboard-welcome,[\s\S]*\.coin-card-surface \{[\s\S]*background-image: none !important;/);
-  assert.match(css, /\.bg-purple-950\\\/30 \{[\s\S]*background-color: #f3e8ff !important;/);
-  assert.match(css, /\.text-purple-200,[\s\S]*\.text-purple-400 \{[\s\S]*color: #6b21a8 !important;/);
+  assert.match(css, /\.bg-amber-950\\\/20,[\s\S]*\.bg-amber-950\\\/30 \{[\s\S]*background-color: #faf7f0 !important;/);
   assert.match(css, /\.text-emerald-200,[\s\S]*\.text-emerald-400 \{[\s\S]*color: #047857 !important;/);
   assert.match(css, /\.sold-status-row \{[\s\S]*background-color: #faf7f0 !important;[\s\S]*border-color: #d8cfc1 !important;/);
   assert.match(css, /\.import-success-message \{[\s\S]*background-color: #d1fae5 !important;[\s\S]*color: #065f46 !important;/);
 });
 
-test('the user interface contains no blue accents', () => {
+test('the user interface contains no blue or violet accents', () => {
   const userInterface = [
     'src/index.css',
     'src/components/CoinFormModal.tsx',
@@ -96,12 +95,14 @@ test('the user interface contains no blue accents', () => {
     'src/components/AuthModal.tsx',
     'src/components/BackupExportView.tsx',
     'src/components/CoinCard.tsx',
+    'src/components/CoinList.tsx',
+    'src/components/Header.tsx',
     'src/components/PrintModal.tsx',
     'src/utils/storage.ts',
     'src/data/rarities.ts',
   ].map(source).join('\n');
-  assert.equal(/\b(?:bg|text|border|ring|from|via|to)-(?:blue|sky)-/.test(userInterface), false);
-  assert.equal(/#(?:2563eb|1d4ed8|93c5fd)/i.test(userInterface), false);
+  assert.equal(/\b(?:bg|text|border|ring|from|via|to)-(?:blue|sky|purple|violet|indigo|fuchsia)-/.test(userInterface), false);
+  assert.equal(/#(?:2563eb|1d4ed8|93c5fd|6b21a8|c4b5fd|f3e8ff)/i.test(userInterface), false);
 });
 
 test('the marked phone controls stay simple and clearly labelled', () => {
@@ -119,7 +120,7 @@ test('the marked phone controls stay simple and clearly labelled', () => {
   assert.match(backup, /CSV-Vorlage herunterladen/);
   assert.match(backup, /import-success-message/);
   assert.match(form, /sold-status-row/);
-  assert.match(form, /formData\.isForSale \? 'bg-purple-600' : 'bg-slate-800'/);
+  assert.match(form, /formData\.isForSale \? 'bg-amber-600' : 'bg-slate-800'/);
   assert.match(form, /formData\.isSold \? 'bg-emerald-600' : 'bg-slate-800'/);
   assert.match(form, /formData\.isSold[\s\S]*Münze wurde bereits verkauft ✅[\s\S]*Münze ist noch nicht verkauft/);
   assert.equal(form.includes('peer-checked:after:translate-x-full'), false);
