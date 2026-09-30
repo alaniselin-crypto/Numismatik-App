@@ -1212,9 +1212,9 @@ export const CoinFormModal: React.FC<CoinFormModalProps> = ({
             </h3>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div className="sm:col-span-2 p-3.5 rounded-xl bg-blue-500/10 border border-blue-500/30">
+              <div className="sm:col-span-2 p-3.5 rounded-xl bg-amber-500/10 border border-amber-500/30">
                 <div className="flex items-center justify-between mb-1.5">
-                  <label className="text-xs font-semibold text-blue-300">
+                  <label className="text-xs font-semibold text-amber-300">
                     📁 Lagerort / Ordner (Physische Aufbewahrung)
                   </label>
                   {onOpenFolderManager && (
@@ -1240,7 +1240,7 @@ export const CoinFormModal: React.FC<CoinFormModalProps> = ({
                           setFormData({ ...formData, storageLocation: e.target.value });
                         }
                       }}
-                      className="w-full px-3 py-2.5 rounded-xl bg-slate-900 border border-slate-700 text-sm text-blue-200 focus:outline-none focus:ring-2 focus:ring-blue-500/50 cursor-pointer"
+                      className="w-full px-3 py-2.5 rounded-xl bg-slate-900 border border-slate-700 text-sm text-amber-200 focus:outline-none focus:ring-2 focus:ring-amber-500/50 cursor-pointer"
                     >
                       <option value="" disabled>-- Dropdown: Ordner auswählen --</option>
                       {availableFolders.map(f => (
@@ -1260,7 +1260,7 @@ export const CoinFormModal: React.FC<CoinFormModalProps> = ({
                       value={formData.storageLocation}
                       onChange={e => setFormData({ ...formData, storageLocation: e.target.value })}
                       placeholder="oder genauen Standort eingeben (z.B. Ordner 1, Fach 3)"
-                      className="w-full px-3.5 py-2.5 rounded-xl bg-slate-900 border border-slate-700 text-sm text-blue-100 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500/50"
+                      className="w-full px-3.5 py-2.5 rounded-xl bg-slate-900 border border-slate-700 text-sm text-amber-100 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-amber-500/50"
                     />
                   </div>
                 </div>

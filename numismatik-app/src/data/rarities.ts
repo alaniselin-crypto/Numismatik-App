@@ -49,19 +49,19 @@ export const RARITY_OPTIONS: RarityOption[] = [
     code: 'RR',
     label: 'Sehr Selten',
     fullLabel: 'RR - Sehr Selten',
-    badgeBgClass: 'bg-sky-500/20',
-    badgeTextClass: 'text-sky-300',
-    badgeBorderClass: 'border-sky-500/40',
-    pillBg: 'bg-sky-200 text-sky-950 font-semibold'
+    badgeBgClass: 'bg-orange-500/20',
+    badgeTextClass: 'text-orange-300',
+    badgeBorderClass: 'border-orange-500/40',
+    pillBg: 'bg-orange-200 text-orange-950 font-semibold'
   },
   {
     code: 'RRR',
     label: 'Äusserst selten',
     fullLabel: 'RRR - Äusserst selten',
-    badgeBgClass: 'bg-blue-600/30',
-    badgeTextClass: 'text-blue-200',
-    badgeBorderClass: 'border-blue-500/50',
-    pillBg: 'bg-blue-800 text-white font-semibold'
+    badgeBgClass: 'bg-purple-600/30',
+    badgeTextClass: 'text-purple-200',
+    badgeBorderClass: 'border-purple-500/50',
+    pillBg: 'bg-purple-800 text-white font-semibold'
   }
 ];
 

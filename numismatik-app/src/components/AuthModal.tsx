@@ -401,7 +401,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                 disabled={isLoading}
                 className="w-full py-2.5 px-4 rounded-xl bg-slate-900 hover:bg-slate-800 text-slate-200 border border-slate-700/80 text-xs font-semibold flex items-center justify-center space-x-2 transition-colors cursor-pointer"
               >
-                <Globe className="w-4 h-4 text-blue-400" />
+                <Globe className="w-4 h-4 text-amber-400" />
                 <span>Mit Google-Konto anmelden</span>
               </button>
 

@@ -519,7 +519,7 @@ export function getConditionLabel(condition: string): { label: string; full: str
     case 'stgl':
       return { label: 'stgl', full: 'Stempelglanz', color: 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40' };
     case 'vz':
-      return { label: 'vz', full: 'Vorzüglich', color: 'bg-blue-500/20 text-blue-300 border-blue-500/40' };
+      return { label: 'vz', full: 'Vorzüglich', color: 'bg-amber-500/20 text-amber-300 border-amber-500/40' };
     case 'ss':
       return { label: 'ss', full: 'Sehr schön', color: 'bg-purple-500/20 text-purple-300 border-purple-500/40' };
     case 's':

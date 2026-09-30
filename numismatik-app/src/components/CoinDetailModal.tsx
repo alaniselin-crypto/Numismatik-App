@@ -351,12 +351,12 @@ export const CoinDetailModal: React.FC<CoinDetailModalProps> = ({
                 )}
 
                 {coin.storageLocation && (
-                  <div className="p-3 rounded-xl bg-blue-500/10 border border-blue-500/30 flex justify-between items-center">
-                    <span className="text-blue-300 font-semibold flex items-center gap-1">
-                      <Folder className="w-3.5 h-3.5 text-blue-400" />
+                  <div className="p-3 rounded-xl bg-amber-500/10 border border-amber-500/30 flex justify-between items-center">
+                    <span className="text-amber-300 font-semibold flex items-center gap-1">
+                      <Folder className="w-3.5 h-3.5 text-amber-400" />
                       Lagerort / Ordner:
                     </span>
-                    <span className="font-semibold text-blue-200">{coin.storageLocation}</span>
+                    <span className="font-semibold text-amber-200">{coin.storageLocation}</span>
                   </div>
                 )}
                 <div className="p-3 rounded-xl bg-slate-900/60 border border-slate-800/80 flex justify-between">

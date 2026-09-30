@@ -228,8 +228,8 @@ export const FolderManagerModal: React.FC<FolderManagerModalProps> = ({
             )}
           </div>
 
-          <div className="p-3.5 rounded-xl bg-blue-500/10 border border-blue-500/20 text-xs text-blue-200 flex items-start space-x-2.5">
-            <Info className="w-4 h-4 text-blue-400 shrink-0 mt-0.5" />
+          <div className="p-3.5 rounded-xl bg-amber-500/10 border border-amber-500/20 text-xs text-amber-200 flex items-start space-x-2.5">
+            <Info className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
             <div>
               <strong>Tipp zur Automatisierung:</strong> Wenn Sie einen Ordner hier umbenennen (z.B. von <em>"Ordner 1"</em> in <em>"Ordner 1 - Schweiz Vreneli"</em>), werden <strong>automatisch alle zugehörigen Münzen</strong> in der Datenbank auf den neuen Namen aktualisiert!
             </div>

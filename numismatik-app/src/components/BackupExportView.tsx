@@ -250,7 +250,7 @@ export const BackupExportView: React.FC<BackupExportViewProps> = ({
         {/* Import Card */}
         <div className="bg-[#181a22] border border-slate-800 hover:border-amber-500/30 rounded-2xl p-6 shadow-lg flex flex-col justify-between">
           <div className="space-y-4">
-            <div className="w-12 h-12 rounded-2xl bg-blue-500/10 border border-blue-500/30 flex items-center justify-center text-blue-400">
+            <div className="w-12 h-12 rounded-2xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400">
               <Upload className="w-6 h-6" />
             </div>
 

@@ -183,7 +183,7 @@ export const PrintModal: React.FC<PrintModalProps> = ({ isOpen, coins, onClose }
       </head>
       <body>
         <div style="margin-bottom: 15px;" class="no-print-btn">
-          <button onclick="window.print()" style="padding: 10px 20px; background: #2563eb; color: white; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 13px;">
+          <button onclick="window.print()" style="padding: 10px 20px; background: #d97706; color: white; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 13px;">
             🖨️ Druckdialog jetzt öffnen / als PDF speichern
           </button>
         </div>

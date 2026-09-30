@@ -80,10 +80,28 @@ test('light mode covers every dark app surface and translucent card', () => {
   assert.match(css, /\.dashboard-welcome,[\s\S]*\.coin-card-surface \{[\s\S]*background-image: none !important;/);
   assert.match(css, /\.bg-purple-950\\\/30 \{[\s\S]*background-color: #f3e8ff !important;/);
   assert.match(css, /\.text-purple-200,[\s\S]*\.text-purple-400 \{[\s\S]*color: #6b21a8 !important;/);
-  assert.match(css, /\.text-blue-200,[\s\S]*\.text-blue-400 \{[\s\S]*color: #1d4ed8 !important;/);
   assert.match(css, /\.text-emerald-200,[\s\S]*\.text-emerald-400 \{[\s\S]*color: #047857 !important;/);
   assert.match(css, /\.sold-status-row \{[\s\S]*background-color: #faf7f0 !important;[\s\S]*border-color: #d8cfc1 !important;/);
   assert.match(css, /\.import-success-message \{[\s\S]*background-color: #d1fae5 !important;[\s\S]*color: #065f46 !important;/);
+});
+
+test('the user interface contains no blue accents', () => {
+  const userInterface = [
+    'src/index.css',
+    'src/components/CoinFormModal.tsx',
+    'src/components/PlatformManagerModal.tsx',
+    'src/components/Dashboard.tsx',
+    'src/components/FolderManagerModal.tsx',
+    'src/components/CoinDetailModal.tsx',
+    'src/components/AuthModal.tsx',
+    'src/components/BackupExportView.tsx',
+    'src/components/CoinCard.tsx',
+    'src/components/PrintModal.tsx',
+    'src/utils/storage.ts',
+    'src/data/rarities.ts',
+  ].map(source).join('\n');
+  assert.equal(/\b(?:bg|text|border|ring|from|via|to)-(?:blue|sky)-/.test(userInterface), false);
+  assert.equal(/#(?:2563eb|1d4ed8|93c5fd)/i.test(userInterface), false);
 });
 
 test('the marked phone controls stay simple and clearly labelled', () => {

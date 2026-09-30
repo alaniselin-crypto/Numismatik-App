@@ -140,7 +140,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
         <div className="bg-[#241c18] border border-[#3e2e26] hover:border-amber-500/40 rounded-2xl p-5 shadow-lg transition-all">
           <div className="flex items-center justify-between text-stone-400 mb-2">
             <span className="text-xs uppercase font-semibold tracking-wider">Gesamtbestand</span>
-            <div className="p-2 rounded-xl bg-blue-500/10 text-blue-400">
+            <div className="p-2 rounded-xl bg-amber-500/10 text-amber-400">
               <Award className="w-5 h-5" />
             </div>
           </div>

@@ -301,10 +301,6 @@ html.light .border-purple-500\/30,
 html.light .border-purple-500\/40 {
   border-color: #c4b5fd !important;
 }
-html.light .border-blue-500\/20,
-html.light .border-blue-500\/30 {
-  border-color: #93c5fd !important;
-}
 
 /* Auch halbtransparente und bisher nicht einzeln erfasste Ränder aufhellen. */
 html.light [class*="border-[#"],
@@ -336,9 +332,6 @@ html.light .text-amber-200, html.light .text-amber-100 {
 }
 html.light .text-purple-200, html.light .text-purple-300, html.light .text-purple-400 {
   color: #6b21a8 !important;
-}
-html.light .text-blue-200, html.light .text-blue-300, html.light .text-blue-400 {
-  color: #1d4ed8 !important;
 }
 html.light .text-emerald-200, html.light .text-emerald-300, html.light .text-emerald-400 {
   color: #047857 !important;

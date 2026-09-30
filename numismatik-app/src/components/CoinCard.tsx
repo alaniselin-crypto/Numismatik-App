@@ -123,7 +123,7 @@ export const CoinCard: React.FC<CoinCardProps> = ({
                 {coin.storageLocation && (
                   <>
                     <span>•</span>
-                    <span className="text-[10px] text-blue-300 bg-blue-500/15 px-1.5 py-0.5 rounded border border-blue-500/30 flex items-center gap-1">
+                    <span className="text-[10px] text-amber-300 bg-amber-500/15 px-1.5 py-0.5 rounded border border-amber-500/30 flex items-center gap-1">
                       <Folder className="w-2.5 h-2.5" />
                       {coin.storageLocation}
                     </span>
@@ -295,8 +295,8 @@ export const CoinCard: React.FC<CoinCardProps> = ({
           )}
 
           {coin.storageLocation && (
-            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-blue-500/15 text-blue-300 border border-blue-500/30 font-medium truncate max-w-[180px]">
-              <Folder className="w-3 h-3 text-blue-400 shrink-0" />
+            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-amber-500/15 text-amber-300 border border-amber-500/30 font-medium truncate max-w-[180px]">
+              <Folder className="w-3 h-3 text-amber-400 shrink-0" />
               <span>{coin.storageLocation}</span>
             </span>
           )}
