@@ -41,7 +41,7 @@ cat > "$STAGE/ANLEITUNG.txt" << 'EOF'
 Numismatik auf dem iPhone öffnen
 =================================
 
-Das ist Build 48. Ohne Anmeldung bleibt die Sammlung vollständig verborgen.
+Das ist Build 49. Ohne Anmeldung bleibt die Sammlung vollständig verborgen.
 Die neue Startseite bietet Google-Anmeldung sowie E-Mail/Passwort-Anmeldung.
 Die native Abmeldung ist gegen den bisherigen iPhone-Absturz abgesichert.
 Kleine Schriften sind auf dem iPhone größer; der Verkaufswert ist optional.
@@ -67,7 +67,7 @@ die alte App.
 5. Menü Product → Archive.
    Danach Distribute App → App Store Connect → Upload.
 
-6. In App Store Connect unter TestFlight auf Build 1.0 (48) warten.
+6. In App Store Connect unter TestFlight auf Build 1.0 (49) warten.
    Status zuerst «Wird verarbeitet», dann «Abgeschlossen».
    Danach in der TestFlight-App auf dem iPhone auf Aktualisieren tippen.
 
