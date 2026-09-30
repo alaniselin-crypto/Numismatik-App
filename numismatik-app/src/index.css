@@ -278,8 +278,14 @@ html.light .coin-card-surface {
   border-color: #d8cfc1 !important;
 }
 
-/* Statusmeldungen bleiben grün und gut lesbar statt dunkelblau-grau. */
-html.light .sold-status-row,
+/* Der Verkaufsstatus sieht wie die übrigen hellen Formularfelder aus. */
+html.light .sold-status-row {
+  background-color: #faf7f0 !important;
+  border-color: #d8cfc1 !important;
+  color: #065f46 !important;
+}
+
+/* Importmeldungen bleiben grün und gut lesbar statt dunkelblau-grau. */
 html.light .import-success-message {
   background-color: #d1fae5 !important;
   border-color: #6ee7b7 !important;
