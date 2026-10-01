@@ -3,6 +3,7 @@ import { X, Save, Upload, Camera, Sparkles, AlertCircle, Folder, Settings, Hash,
 import { Coin, CoinCondition, CustomFieldDefinition } from '../types';
 import { AutoCoinPreview } from './AutoCoinPreview';
 import { formatSKU } from '../utils/storage';
+import { fullSizePhotoUrl } from '../utils/coinPhotoUrls';
 import { WORLD_COUNTRIES, POPULAR_COIN_COUNTRIES } from '../data/countries';
 import { POPULAR_CURRENCIES } from '../data/currencies';
 import { RARITY_OPTIONS } from '../data/rarities';
@@ -203,8 +204,8 @@ export const CoinFormModal: React.FC<CoinFormModalProps> = ({
     setAiSuccess(null);
     try {
       const res = await requestAiCoinInfo({
-        imageUrl: formData.imageUrl,
-        reverseImageUrl: formData.reverseImageUrl
+        imageUrl: initialCoin && formData.imageUrl === initialCoin.imageUrl ? fullSizePhotoUrl(initialCoin, 'front') : formData.imageUrl,
+        reverseImageUrl: initialCoin && formData.reverseImageUrl === initialCoin.reverseImageUrl ? fullSizePhotoUrl(initialCoin, 'back') : formData.reverseImageUrl
       });
 
       const data = await res.json();

@@ -1,9 +1,12 @@
 import {
   collection,
+  deleteField,
   doc,
   getDoc,
   getDocs,
+  query,
   runTransaction,
+  where,
   serverTimestamp,
   setDoc,
   writeBatch,
@@ -16,6 +19,7 @@ import {
   getHighestCatalogNumber,
 } from './catalogNumberCounter';
 import { isDriveEnabled, uploadDrivePhoto, deleteDrivePhoto } from './googleDrive';
+import { deleteAllCoinPhotosForUser, deleteCoinPhoto, isFirebaseStorageUrl, uploadCoinPhoto } from './coinPhotoStorage';
 
 const USERS_COLLECTION = 'users';
 const COINS_COLLECTION = 'coins';
@@ -278,9 +282,9 @@ export async function reserveNextCatalogNumberForUser(uid: string, knownCoins: C
   }
 }
 
-export async function compressDataUrlIfNeeded(dataUrl: string, maxDim = 800, quality = 0.75): Promise<string> {
+export async function compressDataUrlIfNeeded(dataUrl: string, maxDim = 800, quality = 0.75, minLength = 300 * 1024): Promise<string> {
   if (!dataUrl || !dataUrl.startsWith('data:image/')) return dataUrl;
-  if (dataUrl.length < 300 * 1024) return dataUrl;
+  if (dataUrl.length < minLength) return dataUrl;
 
   return new Promise(resolve => {
     const img = new Image();
@@ -333,6 +337,8 @@ export async function saveCoinToFirestore(uid: string, coin: Coin): Promise<Coin
     let reverseImageUrl = fullBack;
     let driveFrontFileId = coin.driveFrontFileId;
     let driveBackFileId = coin.driveBackFileId;
+    let driveFrontUploaded = false;
+    let driveBackUploaded = false;
 
     // Google Drive: Foto in voller Grösse in die Cloud, nur kleines Vorschaubild in der App behalten.
     if (isDriveEnabled()) {
@@ -341,6 +347,7 @@ export async function saveCoinToFirestore(uid: string, coin: Coin): Promise<Coin
         if (uploaded) {
           if (driveFrontFileId && driveFrontFileId !== uploaded) void deleteDrivePhoto(driveFrontFileId);
           driveFrontFileId = uploaded;
+          driveFrontUploaded = true;
           imageUrl = await compressDataUrlIfNeeded(fullFront, 480, 0.7);
         }
       }
@@ -349,12 +356,49 @@ export async function saveCoinToFirestore(uid: string, coin: Coin): Promise<Coin
         if (uploaded) {
           if (driveBackFileId && driveBackFileId !== uploaded) void deleteDrivePhoto(driveBackFileId);
           driveBackFileId = uploaded;
+          driveBackUploaded = true;
           reverseImageUrl = await compressDataUrlIfNeeded(fullBack, 480, 0.7);
         }
       }
     }
 
-    const coinData = {
+    // Firebase Storage: volles Foto als Datei, in der Münze bleibt nur ein kleines Vorschaubild (offline sichtbar).
+    // Schlägt der Upload fehl, bleibt das Foto wie bisher direkt in der Münze gespeichert.
+    const replacedStorageUrls: string[] = [];
+    const storeSide = async (
+      side: 'front' | 'back',
+      full: string,
+      currentUrl: string | undefined,
+      dirty: boolean,
+      onDrive: boolean,
+    ): Promise<{ url: string | undefined; preview: string | null }> => {
+      if (!full || onDrive) {
+        if (currentUrl) replacedStorageUrls.push(currentUrl);
+        return { url: undefined, preview: null };
+      }
+      if (currentUrl && !dirty) return { url: currentUrl, preview: null };
+      if (!full.startsWith('data:image/')) {
+        if (currentUrl) replacedStorageUrls.push(currentUrl);
+        return { url: undefined, preview: null };
+      }
+      const uploaded = await uploadCoinPhoto(validUid, coin.id, side, full);
+      if (!uploaded) {
+        if (currentUrl) replacedStorageUrls.push(currentUrl);
+        return { url: undefined, preview: null };
+      }
+      if (currentUrl && currentUrl !== uploaded) replacedStorageUrls.push(currentUrl);
+      return { url: uploaded, preview: await compressDataUrlIfNeeded(full, 480, 0.72, 0) };
+    };
+    const frontOnDrive = Boolean(driveFrontFileId) && (driveFrontUploaded || !coin.driveFrontDirty);
+    const backOnDrive = Boolean(driveBackFileId) && (driveBackUploaded || !coin.driveBackDirty);
+    const [frontStorage, backStorage] = await Promise.all([
+      storeSide('front', fullFront, coin.storageFrontUrl, coin.driveFrontDirty === true, frontOnDrive),
+      storeSide('back', fullBack, coin.storageBackUrl, coin.driveBackDirty === true, backOnDrive),
+    ]);
+    if (frontStorage.preview) imageUrl = frontStorage.preview;
+    if (backStorage.preview) reverseImageUrl = backStorage.preview;
+
+    const coinData: Record<string, unknown> = {
       ...cleanCoinData(coin),
       imageUrl,
       reverseImageUrl,
@@ -362,18 +406,40 @@ export async function saveCoinToFirestore(uid: string, coin: Coin): Promise<Coin
       driveBackFileId,
       driveFrontDirty: false,
       driveBackDirty: false,
+      storageFrontUrl: frontStorage.url ?? deleteField(),
+      storageBackUrl: backStorage.url ?? deleteField(),
       updatedAt: coin.updatedAt || new Date().toISOString(),
     };
+    Object.keys(coinData).forEach(key => { if (coinData[key] === undefined) delete coinData[key]; });
     await runTransaction(db, async transaction => {
       const tombstone = await transaction.get(userTombstoneDocument(validUid, coin.id));
       if (tombstone.exists()) throw new Error(`Coin ${coin.id} is protected by a deletion tombstone.`);
       transaction.set(userCoinDocument(validUid, coin.id), coinData, { merge: true });
     });
-    // Rückgabe: die tatsächlich gespeicherte Version (inkl. Drive-Datei-IDs)
-    return coinData as unknown as Coin;
+    replacedStorageUrls.forEach(url => { void deleteStoragePhotoIfUnused(validUid, url, coin.id); });
+    // Rückgabe: die tatsächlich gespeicherte Version (inkl. Drive-Datei-IDs und Storage-Links)
+    const savedCoin = { ...coinData } as Record<string, unknown>;
+    if (!frontStorage.url) delete savedCoin.storageFrontUrl;
+    if (!backStorage.url) delete savedCoin.storageBackUrl;
+    return savedCoin as unknown as Coin;
   } catch (error) {
     handleFirestoreError(error, OperationType.WRITE, coinPath);
     return null;
+  }
+}
+
+// Duplikate teilen sich dieselbe Foto-Datei; gelöscht wird nur, wenn keine andere Münze sie noch nutzt.
+async function deleteStoragePhotoIfUnused(uid: string, url: string, exceptCoinId: string): Promise<void> {
+  if (!isFirebaseStorageUrl(url)) return;
+  try {
+    const [front, back] = await Promise.all([
+      getDocs(query(userCoinsCollection(uid), where('storageFrontUrl', '==', url))),
+      getDocs(query(userCoinsCollection(uid), where('storageBackUrl', '==', url))),
+    ]);
+    const stillUsed = [...front.docs, ...back.docs].some(document => document.id !== exceptCoinId);
+    if (!stillUsed) await deleteCoinPhoto(url);
+  } catch (error) {
+    console.warn('Firebase Storage cleanup skipped:', error);
   }
 }
 
@@ -381,12 +447,14 @@ export async function deleteCoinFromFirestore(uid: string, coinId: string): Prom
   const validUid = requireUid(uid);
   const coinPath = `${userPath(validUid)}/${COINS_COLLECTION}/${coinId}`;
   try {
+    let storageUrls: string[] = [];
     // Google Drive Fotos des Münzeintrags mitlöschen (bestmöglich)
     try {
       const snapshot = await getDoc(userCoinDocument(validUid, coinId));
       const existing = snapshot.data() as Coin | undefined;
       if (existing?.driveFrontFileId) void deleteDrivePhoto(existing.driveFrontFileId);
       if (existing?.driveBackFileId) void deleteDrivePhoto(existing.driveBackFileId);
+      storageUrls = [existing?.storageFrontUrl, existing?.storageBackUrl].filter(isFirebaseStorageUrl);
     } catch {
       // Drive-Aufräumen darf das Löschen nie blockieren
     }
@@ -394,6 +462,7 @@ export async function deleteCoinFromFirestore(uid: string, coinId: string): Prom
     batch.set(userTombstoneDocument(validUid, coinId), { coinId, deletedAt: serverTimestamp() });
     batch.delete(userCoinDocument(validUid, coinId));
     await batch.commit();
+    storageUrls.forEach(url => { void deleteStoragePhotoIfUnused(validUid, url, coinId); });
   } catch (error) {
     handleFirestoreError(error, OperationType.DELETE, coinPath);
   }
@@ -413,6 +482,7 @@ export async function clearAllCoinsFromFirestore(uid: string): Promise<void> {
       });
       await batch.commit();
     }
+    void deleteAllCoinPhotosForUser(validUid);
   } catch (error) {
     handleFirestoreError(error, OperationType.DELETE, `${userPath(validUid)}/${COINS_COLLECTION}`);
   }
@@ -437,6 +507,7 @@ export async function deleteAllUserDataFromFirestore(uid: string): Promise<void>
       references.slice(index, index + 450).forEach(reference => batch.delete(reference));
       await batch.commit();
     }
+    await deleteAllCoinPhotosForUser(validUid);
   } catch (error) {
     handleFirestoreError(error, OperationType.DELETE, userPath(validUid));
   }

@@ -42,6 +42,8 @@ export interface Coin {
   driveBackFileId?: string; // Google Drive: Foto Rückseite in voller Grösse
   driveFrontDirty?: boolean; // Neues Foto hochgeladen, muss (wieder) nach Google Drive
   driveBackDirty?: boolean;
+  storageFrontUrl?: string; // Firebase Storage: Foto Vorderseite in voller Grösse
+  storageBackUrl?: string; // Firebase Storage: Foto Rückseite in voller Grösse
   rawBaseName?: string; // Für Bildzuordnung (Avers & Revers Pairing)
   isFavorite?: boolean;
   

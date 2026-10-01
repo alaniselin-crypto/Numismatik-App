@@ -4,6 +4,7 @@ import { Coin, CustomFieldDefinition } from '../types';
 import { CoinAvatar } from './CoinAvatar';
 import { formatCurrency, getConditionLabel, formatSKU, getCoinTitle } from '../utils/storage';
 import { fetchDrivePhotoUrl } from '../utils/googleDrive';
+import { fullSizePhotoUrl } from '../utils/coinPhotoUrls';
 import { getRarityOption } from '../data/rarities';
 
 interface CoinDetailModalProps {
@@ -100,7 +101,7 @@ export const CoinDetailModal: React.FC<CoinDetailModalProps> = ({
                 <div className="flex flex-col items-center group">
                   <div className="relative">
                     <div 
-                      onClick={() => coin.imageUrl && openLightbox(coin.imageUrl, `${coin.name} - Vorderseite (Avers)`, coin.driveFrontFileId)}
+                      onClick={() => coin.imageUrl && openLightbox(fullSizePhotoUrl(coin, 'front'), `${coin.name} - Vorderseite (Avers)`, coin.driveFrontFileId)}
                       className="relative cursor-pointer transition-transform hover:scale-105"
                     >
                       <CoinAvatar
@@ -138,7 +139,7 @@ export const CoinDetailModal: React.FC<CoinDetailModalProps> = ({
                   <div className="flex flex-col items-center group">
                     <div className="relative">
                       <div 
-                        onClick={() => openLightbox(coin.reverseImageUrl!, `${coin.name} - Rückseite (Revers)`, coin.driveBackFileId)}
+                        onClick={() => openLightbox(fullSizePhotoUrl(coin, 'back'), `${coin.name} - Rückseite (Revers)`, coin.driveBackFileId)}
                         className="relative cursor-pointer transition-transform hover:scale-105"
                       >
                         <CoinAvatar

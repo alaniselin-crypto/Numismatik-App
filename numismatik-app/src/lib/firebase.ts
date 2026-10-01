@@ -1,6 +1,7 @@
 import { initializeApp } from 'firebase/app';
 import { getAuth, GoogleAuthProvider, inMemoryPersistence, initializeAuth } from 'firebase/auth';
 import { getFirestore } from 'firebase/firestore';
+import { getStorage } from 'firebase/storage';
 import { Capacitor } from '@capacitor/core';
 import firebaseConfig from '../../firebase-applet-config.json';
 
@@ -20,6 +21,9 @@ function createAuth() {
 
 export const auth = createAuth();
 export const db = getFirestore(app, firebaseConfig.firestoreDatabaseId || '(default)');
+export const storage = getStorage(app);
+storage.maxUploadRetryTime = 20000;
+storage.maxOperationRetryTime = 20000;
 export const googleProvider = new GoogleAuthProvider();
 
 export default app;
