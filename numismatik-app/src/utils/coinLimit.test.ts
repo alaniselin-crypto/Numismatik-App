@@ -149,3 +149,18 @@ test('photos go to Firebase Storage with an inline preview and an inline fallbac
   assert.match(rules, /request\.auth\.uid == uid/);
   assert.match(rules, /allow read, write: if false;/);
 });
+
+test('the server limits AI requests per month: 30 free, 1000 with Pro, unlimited for the owner', () => {
+  const server = source('server.ts');
+  assert.match(server, /const AI_FREE_MONTHLY_LIMIT = 30;/);
+  assert.match(server, /const AI_PRO_MONTHLY_LIMIT = 1000;/);
+  assert.match(server, /app\.post\("\/api\/generate-coin-info", applyAiCors, requireFirebaseUser, enforceAiQuota, async/);
+  assert.match(server, /collection\("users"\)\.doc\(uid\)\.collection\("aiUsage"\)\.doc\(now\.toISOString\(\)\.slice\(0, 7\)\)/);
+  assert.match(server, /if \(limit !== null && used >= limit\) \{\n\s*return res\.status\(429\)/);
+  assert.match(server, /if \(res\.statusCode !== 200\) return;/);
+  assert.match(server, /console\.warn\("AI quota could not be checked; allowing the request\."[\s\S]*?return next\(\);/);
+  assert.match(server, /Access-Control-Expose-Headers", "X-AI-Quota-Limit, X-AI-Quota-Remaining"/);
+
+  const form = source('src/components/CoinFormModal.tsx');
+  assert.equal((form.match(/\$\{aiQuotaNotice\(res\)\}/g) || []).length, 2);
+});

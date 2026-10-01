@@ -27,6 +27,14 @@ const KNOWN_MATERIALS: string[] = [
   'Papier', 'Baumwollpapier', 'Polymer', 'Hybrid', 'Keramik', 'Porzellan', 'Holz', 'Unbekannt',
 ];
 
+function aiQuotaNotice(res: Response): string {
+  const remaining = Number(res.headers.get('X-AI-Quota-Remaining'));
+  if (!res.headers.has('X-AI-Quota-Remaining') || !Number.isFinite(remaining)) return '';
+  return remaining === 1
+    ? ' Noch 1 KI-Anfrage in diesem Monat.'
+    : ` Noch ${remaining} KI-Anfragen in diesem Monat.`;
+}
+
 async function requestAiCoinInfo(payload: Record<string, unknown>) {
   const currentUser = auth.currentUser;
   if (!currentUser) {
@@ -235,7 +243,7 @@ export const CoinFormModal: React.FC<CoinFormModalProps> = ({
         currentValue: recognizedValue ?? prev.currentValue,
         notes: (!prev.notes || prev.notes === 'Keine') && data.description ? data.description : prev.notes
       }));
-      setAiSuccess(`✨ KI-Erkennung erfolgreich: Seltenheit, Erhaltung, Verkaufswert und Material wurden übernommen.`);
+      setAiSuccess(`✨ KI-Erkennung erfolgreich: Seltenheit, Erhaltung, Verkaufswert und Material wurden übernommen.${aiQuotaNotice(res)}`);
       setTimeout(() => setAiSuccess(null), 6000);
     } catch (err: any) {
       alert(err.message || 'Fehler bei der KI-Generierung');
@@ -274,7 +282,7 @@ export const CoinFormModal: React.FC<CoinFormModalProps> = ({
           ...prev,
           notes: text
         }));
-        setAiSuccess('✨ Bemerkungen wurden erfolgreich von KI verfasst!');
+        setAiSuccess(`✨ Bemerkungen wurden erfolgreich von KI verfasst!${aiQuotaNotice(res)}`);
         setTimeout(() => setAiSuccess(null), 6000);
       }
     } catch (err: any) {

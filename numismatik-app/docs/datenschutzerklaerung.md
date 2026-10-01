@@ -51,6 +51,8 @@ Die App greift nur nach Erlaubnis des Benutzers auf Kamera oder Fotomediathek zu
 
 Wenn der Benutzer die KI-Erkennung oder die KI-Beschreibung ausdrücklich startet, werden die ausgewählten Münzfotos und die bereits erfassten Angaben über unseren Server an OpenAI übermittelt, um die Münze zu bestimmen und Angaben vorzuschlagen. Nach Angaben von OpenAI werden über die Programmierschnittstelle übermittelte Daten nicht zum Training der Modelle verwendet und höchstens 30 Tage zur Missbrauchserkennung aufbewahrt.
 
+Um die Kosten zu begrenzen, zählen wir pro Benutzerkonto die Anzahl KI-Anfragen je Monat (Gratis-Version 30, Numismatik Pro 1000). Gespeichert wird nur die Anzahl, nicht der Inhalt.
+
 KI-Ergebnisse können falsch oder unvollständig sein und sollten vom Benutzer geprüft werden.
 
 ## 8. Abonnement „Numismatik Pro“ und In-App-Käufe
