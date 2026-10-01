@@ -5,7 +5,7 @@ import { exportCoinsToCSV, downloadCSVFile, parseCSVToCoins, downloadCSVTemplate
 
 interface BackupExportViewProps {
   coins: Coin[];
-  onImportCoins: (newCoins: Coin[], replaceExisting: boolean) => void;
+  onImportCoins: (newCoins: Coin[], replaceExisting: boolean) => boolean | void;
 }
 
 export const BackupExportView: React.FC<BackupExportViewProps> = ({
@@ -131,7 +131,10 @@ export const BackupExportView: React.FC<BackupExportViewProps> = ({
       });
 
       if (newCoins.length > 0) {
-        onImportCoins(newCoins, false); // Always merge, don't replace
+        if (onImportCoins(newCoins, false) === false) {
+          setImportErrors(prev => [...prev, 'Import nicht ausgeführt: Die Gratis-Grenze für Münzen ist erreicht.']);
+          return;
+        }
         setImportSuccessMsg(
           `✅ ${newCoins.length} neue Münze(n) importiert${skippedCount > 0 ? ` (${skippedCount} bereits vorhandene übersprungen)` : ''}. Öffnen Sie jede neue Münze und klicken Sie "KI-Erkennung".`
         );
@@ -173,7 +176,10 @@ export const BackupExportView: React.FC<BackupExportViewProps> = ({
       }
 
       if (parsedCoins.length > 0) {
-        onImportCoins(parsedCoins, replaceMode);
+        if (onImportCoins(parsedCoins, replaceMode) === false) {
+          setImportErrors(prev => [...prev, 'Import nicht ausgeführt: Die Gratis-Grenze für Münzen ist erreicht.']);
+          return;
+        }
         setImportSuccessMsg(
           `Erfolgreich ${parsedCoins.length} Münze(n) ${replaceMode ? 'importiert (Sammlung ersetzt)' : 'zu Ihrer Sammlung hinzugefügt'}.`
         );

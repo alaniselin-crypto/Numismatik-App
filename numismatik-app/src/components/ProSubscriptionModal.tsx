@@ -8,6 +8,7 @@ interface ProSubscriptionModalProps {
   loading: boolean;
   busy: boolean;
   error: string | null;
+  notice?: string | null;
   onClose: () => void;
   onPurchase: (productId: AppleProProductId) => void;
   onRestore: () => void;
@@ -19,6 +20,7 @@ export const ProSubscriptionModal: React.FC<ProSubscriptionModalProps> = ({
   loading,
   busy,
   error,
+  notice = null,
   onClose,
   onPurchase,
   onRestore,
@@ -31,10 +33,14 @@ export const ProSubscriptionModal: React.FC<ProSubscriptionModalProps> = ({
         <div className="flex items-start justify-between gap-4">
           <div>
             <h2 id="pro-subscription-title" className="text-xl font-bold text-amber-400">Numismatik Pro</h2>
-            <p className="mt-1 text-sm text-stone-300">Cloud-Synchronisation auf iPhone und Mac.</p>
+            <p className="mt-1 text-sm text-stone-300">Unbegrenzt Münzen speichern und Cloud-Synchronisation auf iPhone und Mac.</p>
           </div>
           <button type="button" onClick={onClose} disabled={busy} aria-label="Schließen" className="text-stone-400 hover:text-white disabled:opacity-50">✕</button>
         </div>
+
+        {notice && (
+          <p role="status" className="mt-4 rounded-xl border border-amber-500/40 bg-amber-500/10 px-4 py-3 text-sm text-amber-200">{notice}</p>
+        )}
 
         <div className="mt-5 space-y-3">
           {loading && <p className="text-sm text-stone-400">App-Store-Angebote werden geladen …</p>}

@@ -85,6 +85,15 @@ import { LoginPage } from './components/LoginPage';
 import { AppInfoModal } from './components/AppInfoModal';
 import { HeroDownloadModal } from './components/HeroDownloadModal';
 import { isAdminUser, setLocalAdmin } from './utils/admin';
+import {
+  FREE_COIN_LIMIT,
+  StoredProEntitlement,
+  canAddCoins,
+  isProEntitlementActive,
+  loadProEntitlement,
+  remainingFreeCoins,
+  saveProEntitlement,
+} from './utils/coinLimit';
 import { collectionToKeepOnSignOut } from './utils/signedOutCollection';
 
 const CATALOG_NUMBER_RESET_VERSION = 23;
@@ -128,6 +137,8 @@ export default function App() {
   const [isProLoading, setIsProLoading] = useState<boolean>(false);
   const [isProBusy, setIsProBusy] = useState<boolean>(false);
   const [proError, setProError] = useState<string | null>(null);
+  const [proNotice, setProNotice] = useState<string | null>(null);
+  const [proEntitlement, setProEntitlement] = useState<StoredProEntitlement | null>(null);
   const [importToast, setImportToast] = useState<string | null>(null);
   const [isFetchingWebhooks, setIsFetchingWebhooks] = useState<boolean>(false);
   const webhookImportRunningRef = useRef(false);
@@ -138,6 +149,10 @@ export default function App() {
   coinsRef.current = coins;
   foldersRef.current = folders;
   platformsRef.current = platforms;
+
+  useEffect(() => {
+    setProEntitlement(loadProEntitlement(userUid));
+  }, [userUid]);
 
   // Preserve existing inventory numbers while normalizing display names.
   const ensureCoinSKUs = (rawCoins: Coin[]): Coin[] => {
@@ -184,11 +199,36 @@ export default function App() {
     return numberedCoins;
   };
 
+  // Übernimmt Vorschaubild und Foto-Links der gespeicherten Version, solange die Fotos lokal seither unverändert sind.
+  const applySavedPhotoFields = (uid: string, original: Coin, saved: Coin | null) => {
+    if (!saved || signedInUidRef.current !== uid) return;
+    const patch = (coin: Coin): Coin => {
+      if (coin.id !== original.id || coin.imageUrl !== original.imageUrl || coin.reverseImageUrl !== original.reverseImageUrl) return coin;
+      return {
+        ...coin,
+        imageUrl: saved.imageUrl,
+        reverseImageUrl: saved.reverseImageUrl,
+        driveFrontFileId: saved.driveFrontFileId,
+        driveBackFileId: saved.driveBackFileId,
+        driveFrontDirty: false,
+        driveBackDirty: false,
+        storageFrontUrl: saved.storageFrontUrl,
+        storageBackUrl: saved.storageBackUrl,
+      };
+    };
+    setCoins(previous => {
+      const next = previous.map(patch);
+      saveUserCoinsToStorage(uid, next);
+      return next;
+    });
+  };
+
   const persistCoinForUser = async (uid: string, coin: Coin): Promise<void> => {
     const mutation = markUserCoinPending(uid, coin);
     try {
-      await saveCoinToFirestore(uid, coin);
+      const saved = await saveCoinToFirestore(uid, coin);
       removeUserPendingMutation(uid, mutation.id);
+      applySavedPhotoFields(uid, coin, saved);
     } catch (error) {
       recordUserPendingMutationFailure(uid, mutation.id, error);
       throw error;
@@ -239,7 +279,8 @@ export default function App() {
             removeUserPendingMutation(uid, mutation.id);
             continue;
           }
-          await saveCoinToFirestore(uid, mutation.coin);
+          const saved = await saveCoinToFirestore(uid, mutation.coin);
+          applySavedPhotoFields(uid, mutation.coin, saved);
         } else if (mutation.type === 'deleteCoin' && mutation.coinId) {
           await deleteCoinFromFirestore(uid, mutation.coinId);
         } else if (mutation.type === 'saveSettings' && mutation.settings) {
@@ -550,8 +591,9 @@ export default function App() {
           }));
           for (const { coin, mutation } of pendingCoinWrites) {
             try {
-              await saveCoinToFirestore(userUid, coin);
+              const saved = await saveCoinToFirestore(userUid, coin);
               removeUserPendingMutation(userUid, mutation.id);
+              applySavedPhotoFields(userUid, coin, saved);
             } catch (error) {
               recordUserPendingMutationFailure(userUid, mutation.id, error);
               const remainsPending = loadUserPendingMutations(userUid).some(item => item.id === mutation.id);
@@ -868,9 +910,46 @@ export default function App() {
     }
   };
 
+  const coinLimitContext = {
+    enforced: isIos,
+    isPro: isProEntitlementActive(proEntitlement),
+    isAdmin,
+  };
+
+  const showCoinLimitReached = (message: string) => {
+    if (user) {
+      setProNotice(message);
+      void handleOpenProModal();
+    } else {
+      setImportToast(message);
+    }
+  };
+
+  const coinLimitMessage = (adding: number) => {
+    const remaining = remainingFreeCoins(coins.length, coinLimitContext);
+    if (adding <= 1 || remaining === 0) {
+      return `Die Gratis-Version speichert bis zu ${FREE_COIN_LIMIT} Münzen. Mit Numismatik Pro können Sie unbegrenzt weitere Münzen erfassen.`;
+    }
+    return `Sie möchten ${adding} neue Münzen hinzufügen, gratis sind noch ${remaining} möglich (Grenze ${FREE_COIN_LIMIT}). Mit Numismatik Pro gibt es keine Grenze.`;
+  };
+
+  const ensureRoomForNewCoins = (adding: number): boolean => {
+    if (canAddCoins(coins.length, adding, coinLimitContext)) return true;
+    showCoinLimitReached(coinLimitMessage(adding));
+    return false;
+  };
+
+  const openNewCoinForm = () => {
+    if (!ensureRoomForNewCoins(1)) return;
+    setEditCoin(null);
+    setIsFormModalOpen(true);
+  };
+
   // Add / Edit Coin Handler
   const handleSaveCoin = async (coinData: Omit<Coin, 'id' | 'createdAt' | 'updatedAt'> & { id?: string }) => {
     const now = new Date().toISOString();
+
+    if (!coinData.id && !ensureRoomForNewCoins(1)) return;
 
     if (coinData.id) {
       // Edit existing
@@ -882,6 +961,8 @@ export default function App() {
         catalogNumber: targetCoin ? targetCoin.catalogNumber : (coinData.catalogNumber?.trim() || ''),
         updatedAt: now
       } as Coin;
+      if (targetCoin && (updatedCoin.imageUrl || '') !== (targetCoin.imageUrl || '')) updatedCoin.driveFrontDirty = true;
+      if (targetCoin && (updatedCoin.reverseImageUrl || '') !== (targetCoin.reverseImageUrl || '')) updatedCoin.driveBackDirty = true;
 
       const updatedList = coins.map(c => c.id === coinData.id ? updatedCoin : c);
       updateCoinsState(updatedList);
@@ -921,6 +1002,7 @@ export default function App() {
 
   // Duplicate Coin Handler
   const handleDuplicateCoin = async (sourceCoin: Coin) => {
+    if (!ensureRoomForNewCoins(1)) return;
     const now = new Date().toISOString();
     const nextNum = await reserveCatalogNumber(coins);
     const duplicatedCoin: Coin = {
@@ -943,6 +1025,7 @@ export default function App() {
   };
 
   const handleDuplicateRequest = (sourceCoin: Coin) => {
+    if (!ensureRoomForNewCoins(1)) return;
     if (isIos) {
       setCoinToDuplicate(sourceCoin);
       return;
@@ -1003,7 +1086,17 @@ export default function App() {
   };
 
   // CSV Import Handler
-  const handleImportCoins = async (newCoins: Coin[], replaceExisting: boolean) => {
+  const importFitsCoinLimit = (newCoins: Coin[], replaceExisting: boolean): boolean => {
+    if (replaceExisting) {
+      if (canAddCoins(0, newCoins.length, coinLimitContext)) return true;
+      showCoinLimitReached(`Die Gratis-Version speichert bis zu ${FREE_COIN_LIMIT} Münzen, die Datei enthält ${newCoins.length}. Mit Numismatik Pro gibt es keine Grenze.`);
+      return false;
+    }
+    return ensureRoomForNewCoins(newCoins.filter(coin => !findDuplicateCoin(coins, coin)).length);
+  };
+
+  const handleImportCoins = async (newCoins: Coin[], replaceExisting: boolean): Promise<boolean> => {
+    if (replaceExisting && !importFitsCoinLimit(newCoins, true)) return false;
     if (replaceExisting) await preserveIssuedCatalogNumbers(coins);
     const mergedExisting = new Map<string, Coin>();
     const freshRawCoins: Coin[] = [];
@@ -1030,6 +1123,7 @@ export default function App() {
           freshRawCoins.push(nc);
         }
       }
+      if (!ensureRoomForNewCoins(freshRawCoins.length)) return false;
     }
     const numberedNewCoins = await assignMissingCatalogNumbers(
       replaceExisting ? newCoins : freshRawCoins,
@@ -1109,6 +1203,7 @@ export default function App() {
         }
       }
     }
+    return true;
   };
 
   // Clear All Coins Handler
@@ -1139,12 +1234,20 @@ export default function App() {
     }
   };
 
+  const rememberProEntitlement = (entitlement: { productId: string; expiresAt: string }) => {
+    const stored = { productId: entitlement.productId, expiresAt: entitlement.expiresAt };
+    if (userUid) saveProEntitlement(userUid, stored);
+    setProEntitlement(stored);
+    setProNotice(null);
+  };
+
   const handlePurchasePro = async (productId: AppleProProductId) => {
     setIsProBusy(true);
     setProError(null);
     try {
       const entitlement = await appleProSubscriptionActions.purchase(productId);
       if (!entitlement.active) throw new Error('subscription/inactive');
+      rememberProEntitlement(entitlement);
       setIsProModalOpen(false);
       setImportToast('Numismatik Pro ist aktiv.');
     } catch {
@@ -1160,6 +1263,7 @@ export default function App() {
     try {
       const entitlement = await appleProSubscriptionActions.restore();
       if (!entitlement.active) throw new Error('subscription/inactive');
+      rememberProEntitlement(entitlement);
       setIsProModalOpen(false);
       setImportToast('Numismatik Pro wurde wiederhergestellt.');
     } catch {
@@ -1198,10 +1302,7 @@ export default function App() {
       <Header
         totalValue={totalValuation}
         totalCoins={coins.length}
-        onOpenAddModal={() => {
-          setEditCoin(null);
-          setIsFormModalOpen(true);
-        }}
+        onOpenAddModal={openNewCoinForm}
         onOpenGuideModal={() => setIsGuideModalOpen(true)}
         onOpenDriveMigration={() => setIsDriveMigrationOpen(true)}
         onOpenCustomFields={isAdmin ? () => setIsCustomFieldsOpen(true) : undefined}
@@ -1239,10 +1340,7 @@ export default function App() {
         {activeTab === 'dashboard' && (
           <Dashboard
             coins={coins}
-            onOpenAddModal={() => {
-              setEditCoin(null);
-              setIsFormModalOpen(true);
-            }}
+            onOpenAddModal={openNewCoinForm}
             onNavigateToCollection={() => setActiveTab('collection')}
             onViewDetails={(coin) => setDetailCoin(coin)}
           />
@@ -1251,10 +1349,7 @@ export default function App() {
         {activeTab === 'collection' && (
           <CoinList
             coins={coins}
-            onOpenAddModal={() => {
-              setEditCoin(null);
-              setIsFormModalOpen(true);
-            }}
+            onOpenAddModal={openNewCoinForm}
             onViewDetails={(coin) => setDetailCoin(coin)}
             onEdit={(coin) => {
               setEditCoin(coin);
@@ -1277,10 +1372,7 @@ export default function App() {
               Fügen Sie ein neues Münzexemplar mit Erhaltungsgrad, Kaufpreis und Marktwert zu Ihrer Sammlung hinzu.
             </p>
             <button
-              onClick={() => {
-                setEditCoin(null);
-                setIsFormModalOpen(true);
-              }}
+              onClick={openNewCoinForm}
               className="w-full py-3 text-xs font-bold text-stone-950 bg-gradient-to-r from-amber-400 via-amber-300 to-amber-500 hover:from-amber-300 hover:to-amber-400 rounded-xl shadow-lg shadow-amber-500/20 transition-all"
             >
               + Formular zur Münzerfassung öffnen
@@ -1295,7 +1387,11 @@ export default function App() {
         {activeTab === 'backup' && (
           <BackupExportView
             coins={coins}
-            onImportCoins={handleImportCoins}
+            onImportCoins={(newCoins, replaceExisting) => {
+              if (!importFitsCoinLimit(newCoins, replaceExisting)) return false;
+              void handleImportCoins(newCoins, replaceExisting);
+              return true;
+            }}
           />
         )}
       </main>
@@ -1305,8 +1401,7 @@ export default function App() {
         activeTab={activeTab}
         setActiveTab={(tab) => {
           if (tab === 'add') {
-            setEditCoin(null);
-            setIsFormModalOpen(true);
+            openNewCoinForm();
           } else {
             setActiveTab(tab);
           }
@@ -1321,7 +1416,8 @@ export default function App() {
         loading={isProLoading}
         busy={isProBusy}
         error={proError}
-        onClose={() => setIsProModalOpen(false)}
+        notice={proNotice}
+        onClose={() => { setIsProModalOpen(false); setProNotice(null); }}
         onPurchase={productId => { void handlePurchasePro(productId); }}
         onRestore={() => { void handleRestorePro(); }}
       />
