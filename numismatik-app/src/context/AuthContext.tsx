@@ -18,6 +18,8 @@ import { Capacitor } from '@capacitor/core';
 import { FirebaseAuthentication } from '@capacitor-firebase/authentication';
 import { auth, googleProvider } from '../lib/firebase';
 import { deleteAccountOnServer, deleteTestAppleAccountOnServer } from '../utils/accountDeletionApi';
+import { deleteAllCoinPhotosForUser } from '../utils/coinPhotoStorage';
+import { deleteAllUserDataFromFirestore } from '../utils/firestoreStorage';
 import { persistAccountDeletionDiagnostic } from '../utils/accountDeletionDiagnostic';
 import { resolveAccountDeletionProvider } from '../utils/accountDeletionProvider';
 
@@ -279,6 +281,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       if (reauthenticatedUser.user.uid !== originalUid) {
         throw new Error('auth/user-mismatch');
       }
+      await deleteAllCoinPhotosForUser(reauthenticatedUser.user.uid);
       const freshFirebaseIdToken = await runLoggedAccountDeletionStage(
         'getIdToken(true)',
         () => reauthenticatedUser.user.getIdToken(true),
@@ -291,6 +294,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       return;
     }
 
+    await deleteAllCoinPhotosForUser(userToDelete.uid);
     const freshFirebaseIdToken = await runLoggedAccountDeletionStage(
       'getIdToken(true)',
       () => userToDelete.getIdToken(true),
@@ -305,6 +309,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       // ~30 s oder gar nicht. In diesem Fall löschen wir das Konto direkt über
       // Firebase, damit der Benutzer nicht im Produkt gefangen bleibt.
       console.warn('[AccountDeletion] Server deletion failed, using direct Firebase deletion.', serverError);
+      try {
+        await deleteAllUserDataFromFirestore(userToDelete.uid);
+      } catch (cleanupError) {
+        console.warn('[AccountDeletion] Collection cleanup before direct deletion failed.', cleanupError);
+      }
       await runLoggedAccountDeletionStage(
         'Direct Firebase deletion fallback',
         () => deleteUser(userToDelete),

@@ -140,6 +140,10 @@ test('photos go to Firebase Storage with an inline preview and an inline fallbac
   assert.match(app, /updatedCoin\.driveFrontDirty = true/);
   assert.match(app, /updatedCoin\.driveBackDirty = true/);
 
+  const authContext = source('src/context/AuthContext.tsx');
+  assert.equal((authContext.match(/await deleteAllCoinPhotosForUser\(/g) || []).length, 2);
+  assert.match(authContext, /await deleteAllUserDataFromFirestore\(userToDelete\.uid\);[\s\S]*'Direct Firebase deletion fallback'/);
+
   const rules = source('storage.rules');
   assert.match(rules, /match \/users\/\{uid\}\/coins\/\{coinId\}\/\{fileName\}/);
   assert.match(rules, /request\.auth\.uid == uid/);
