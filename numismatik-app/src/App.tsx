@@ -89,6 +89,7 @@ import {
   FREE_COIN_LIMIT,
   StoredProEntitlement,
   canAddCoins,
+  clearProEntitlement,
   isProEntitlementActive,
   loadProEntitlement,
   remainingFreeCoins,
@@ -152,7 +153,31 @@ export default function App() {
 
   useEffect(() => {
     setProEntitlement(loadProEntitlement(userUid));
-  }, [userUid]);
+    if (!isIos || !userUid) return;
+    let cancelled = false;
+    const refresh = () => {
+      void appleProSubscriptionActions.refresh().then(entitlement => {
+        if (cancelled || signedInUidRef.current !== userUid) return;
+        if (entitlement?.active) {
+          const stored = { productId: entitlement.productId, expiresAt: entitlement.expiresAt };
+          saveProEntitlement(userUid, stored);
+          setProEntitlement(stored);
+        } else {
+          clearProEntitlement(userUid);
+          setProEntitlement(null);
+        }
+      }).catch(() => {
+        // Offline oder Server nicht erreichbar: zuletzt bestätigtes Abo bleibt bis zum Ablaufdatum gültig.
+      });
+    };
+    refresh();
+    const onVisible = () => { if (document.visibilityState === 'visible') refresh(); };
+    document.addEventListener('visibilitychange', onVisible);
+    return () => {
+      cancelled = true;
+      document.removeEventListener('visibilitychange', onVisible);
+    };
+  }, [userUid, isIos]);
 
   // Preserve existing inventory numbers while normalizing display names.
   const ensureCoinSKUs = (rawCoins: Coin[]): Coin[] => {

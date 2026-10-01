@@ -20,6 +20,7 @@ export interface AppleProPurchaseCoordinatorDependencies {
   }): Promise<{ signedTransaction: string; transactionId: string }>;
   finish(transactionId: string): Promise<void>;
   restore(): Promise<string>;
+  currentEntitlement?(): Promise<string | null>;
   requestEntitlement(
     firebaseIdToken: string,
     signedTransaction: string,
@@ -110,6 +111,25 @@ export async function restoreApplePro(
     await authenticateAndBind(dependencies);
     const signedTransaction = await dependencies.restore();
     const verificationToken = await dependencies.getFirebaseIdToken(true);
+    if (!validCredential(verificationToken, MAX_FIREBASE_ID_TOKEN_LENGTH)) {
+      throw new AppleProPurchaseCoordinatorError('subscription/unavailable');
+    }
+    return await verify(verificationToken, signedTransaction, dependencies);
+  } catch (error) {
+    if (error instanceof AppleProPurchaseCoordinatorError) throw error;
+    throw new AppleProPurchaseCoordinatorError('subscription/unavailable');
+  }
+}
+
+/** Stille Prüfung beim App-Start: liest das aktuelle Abo vom Gerät, ohne Apple-ID-Abfrage. null = kein Abo auf dem Gerät. */
+export async function refreshApplePro(
+  dependencies: AppleProPurchaseCoordinatorDependencies,
+): Promise<AppleProEntitlementResponse | null> {
+  try {
+    if (!dependencies.currentEntitlement) throw new AppleProPurchaseCoordinatorError('subscription/unavailable');
+    const signedTransaction = await dependencies.currentEntitlement();
+    if (signedTransaction === null) return null;
+    const verificationToken = await dependencies.getFirebaseIdToken(false);
     if (!validCredential(verificationToken, MAX_FIREBASE_ID_TOKEN_LENGTH)) {
       throw new AppleProPurchaseCoordinatorError('subscription/unavailable');
     }

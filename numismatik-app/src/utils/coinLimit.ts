@@ -23,6 +23,15 @@ export function saveProEntitlement(uid: string, entitlement: StoredProEntitlemen
   }
 }
 
+export function clearProEntitlement(uid: string): void {
+  if (!uid) return;
+  try {
+    localStorage.removeItem(proStorageKey(uid));
+  } catch {
+    /* ignore */
+  }
+}
+
 export function loadProEntitlement(uid: string | null | undefined): StoredProEntitlement | null {
   if (!uid) return null;
   try {

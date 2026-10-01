@@ -12,6 +12,7 @@ import {
   saveProEntitlement,
 } from './coinLimit';
 import { fullSizePhotoUrl } from './coinPhotoUrls';
+import { refreshApplePro } from './appleProPurchaseCoordinator';
 
 const appRoot = join(dirname(fileURLToPath(import.meta.url)), '../..');
 const source = (relativePath: string) => readFileSync(join(appRoot, relativePath), 'utf8');
@@ -62,6 +63,50 @@ test('the app checks the limit before adding, duplicating and importing coins', 
   assert.equal((app.match(/onOpenAddModal=\{openNewCoinForm\}/g) || []).length, 3);
   assert.match(app, /rememberProEntitlement\(entitlement\);[\s\S]*rememberProEntitlement\(entitlement\);/);
   assert.doesNotMatch(app, /setEditCoin\(null\);\n\s*setIsFormModalOpen\(true\);\n\s*\}\}/);
+});
+
+test('the silent subscription check never asks for the Apple ID and handles missing subscriptions', async () => {
+  const base = {
+    getFirebaseIdToken: async () => 'firebase-token',
+    requestAccountToken: async () => { throw new Error('must not be called'); },
+    purchase: async () => { throw new Error('must not be called'); },
+    finish: async () => undefined,
+    restore: async () => { throw new Error('restore prompts for the Apple ID'); },
+  };
+  const active = await refreshApplePro({
+    ...base,
+    currentEntitlement: async () => 'signed-jws',
+    requestEntitlement: async (_token, jws) => {
+      assert.equal(jws, 'signed-jws');
+      return { active: true, productId: 'com.alaniselin.numisma.pro.monthly', expiresAt: '2026-12-01T00:00:00.000Z' };
+    },
+  });
+  assert.deepEqual(active, { active: true, productId: 'com.alaniselin.numisma.pro.monthly', expiresAt: '2026-12-01T00:00:00.000Z' });
+
+  const none = await refreshApplePro({
+    ...base,
+    currentEntitlement: async () => null,
+    requestEntitlement: async () => { throw new Error('must not be called'); },
+  });
+  assert.equal(none, null);
+
+  await assert.rejects(refreshApplePro({
+    ...base,
+    currentEntitlement: async () => 'signed-jws',
+    requestEntitlement: async () => { throw new Error('offline'); },
+  }));
+});
+
+test('the app refreshes the subscription silently on start and when it returns to the foreground', () => {
+  const app = source('src/App.tsx');
+  assert.match(app, /appleProSubscriptionActions\.refresh\(\)/);
+  assert.match(app, /addEventListener\('visibilitychange', onVisible\)/);
+  assert.match(app, /clearProEntitlement\(userUid\)/);
+  const swift = source('ios/App/App/AppleStoreKit.swift');
+  const method = swift.slice(swift.indexOf('@objc func currentEntitlement'), swift.indexOf('private static func latestEntitlementJws'));
+  assert.ok(method.length > 0);
+  assert.doesNotMatch(method, /AppStore\.sync/);
+  assert.match(swift, /CAPPluginMethod\(name: "currentEntitlement"/);
 });
 
 test('editing existing coins is never blocked by the limit', () => {

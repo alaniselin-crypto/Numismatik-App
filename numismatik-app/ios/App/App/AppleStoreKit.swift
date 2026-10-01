@@ -11,6 +11,7 @@ import StoreKit
  *  - purchase({ productId, appAccountToken }) -> { signedTransaction, transactionId }
  *  - finish({ transactionId }) -> void
  *  - restore() -> { signedTransaction }
+ *  - currentEntitlement() -> { signedTransaction } (silent, no Apple ID prompt)
  */
 @objc(AppleStoreKitPlugin)
 public class AppleStoreKit: CAPPlugin, CAPBridgedPlugin {
@@ -21,6 +22,7 @@ public class AppleStoreKit: CAPPlugin, CAPBridgedPlugin {
         CAPPluginMethod(name: "purchase", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "finish", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "restore", returnType: CAPPluginReturnPromise),
+        CAPPluginMethod(name: "currentEntitlement", returnType: CAPPluginReturnPromise),
     ]
 
     private static let productIds = [
@@ -124,6 +126,16 @@ public class AppleStoreKit: CAPPlugin, CAPBridgedPlugin {
                 }
             } catch {
                 call.reject("Restore failed", "storekit/restore-failed", error)
+            }
+        }
+    }
+
+    @objc func currentEntitlement(_ call: CAPPluginCall) {
+        Task {
+            if let signedTransaction = await Self.latestEntitlementJws() {
+                call.resolve(["signedTransaction": signedTransaction])
+            } else {
+                call.reject("No active subscription on this device", "storekit/no-entitlement")
             }
         }
     }

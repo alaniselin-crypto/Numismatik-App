@@ -2,11 +2,13 @@ import { fetchAppleAccountToken } from './appleAccountTokenApi';
 import { fetchAppleProEntitlement } from './appleProEntitlementApi';
 import {
   purchaseApplePro,
+  refreshApplePro,
   restoreApplePro,
   type AppleProProductId,
   type AppleProPurchaseCoordinatorDependencies,
 } from './appleProPurchaseCoordinator';
 import {
+  currentAppleProTransaction,
   finishAppleProTransaction,
   listAppleProProducts,
   purchaseAppleProProduct,
@@ -24,6 +26,7 @@ const defaultAdapters: AppleProPurchaseAdapters = {
   purchase: purchaseAppleProProduct,
   finish: finishAppleProTransaction,
   restore: restoreAppleProTransactions,
+  currentEntitlement: currentAppleProTransaction,
   requestEntitlement: fetchAppleProEntitlement,
 };
 
@@ -55,5 +58,6 @@ export function createAppleProSubscriptionActions(
     listProducts: adapters.listProducts,
     purchase: (productId: AppleProProductId) => purchaseApplePro(productId, dependencies),
     restore: () => restoreApplePro(dependencies),
+    refresh: () => refreshApplePro(dependencies),
   };
 }

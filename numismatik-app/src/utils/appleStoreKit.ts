@@ -24,6 +24,7 @@ export interface AppleStoreKitPlugin {
   purchase(request: AppleStoreKitPurchaseRequest): Promise<AppleStoreKitPurchaseResult>;
   finish(request: { transactionId: string }): Promise<void>;
   restore(): Promise<AppleStoreKitTransactionResult>;
+  currentEntitlement?(): Promise<AppleStoreKitTransactionResult>;
 }
 
 const AppleStoreKit = registerPlugin<AppleStoreKitPlugin>('AppleStoreKit');
@@ -103,4 +104,17 @@ export async function restoreAppleProTransactions(
 ): Promise<string> {
   const result = await plugin.restore();
   return signedTransactionFrom(result);
+}
+
+export async function currentAppleProTransaction(
+  plugin: AppleStoreKitPlugin = AppleStoreKit,
+): Promise<string | null> {
+  if (!plugin.currentEntitlement) throw new AppleStoreKitError();
+  try {
+    const result = await plugin.currentEntitlement();
+    return signedTransactionFrom(result);
+  } catch (error) {
+    if ((error as { code?: unknown })?.code === 'storekit/no-entitlement') return null;
+    throw error;
+  }
 }
