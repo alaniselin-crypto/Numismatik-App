@@ -84,6 +84,21 @@ test('light mode covers every dark app surface and translucent card', () => {
   assert.match(css, /\.import-success-message \{[\s\S]*background-color: #d1fae5 !important;[\s\S]*color: #065f46 !important;/);
 });
 
+test('light mode uses one unified accent colour after all other light rules', () => {
+  const css = source('src/index.css');
+  const unified = css.indexOf('Einheitliche Farbwelt im hellen Modus');
+  assert.ok(unified > css.indexOf('html.light .text-stone-950'), 'Unified palette must come last');
+  const block = css.slice(unified);
+  assert.match(block, /--unified-accent: #8a5a1f;/);
+  for (const colour of ['amber', 'emerald', 'orange', 'yellow', 'green']) {
+    assert.match(block, new RegExp(`\\[class\\*=" bg-${colour}-"\\]`));
+    assert.match(block, new RegExp(`\\[class\\*=" text-${colour}-"\\]`));
+    assert.match(block, new RegExp(`\\[class\\*=" border-${colour}-"\\]`));
+  }
+  assert.match(block, /\.from-amber-400[\s\S]*background-color: var\(--unified-accent-solid\) !important;[\s\S]*color: #ffffff !important;/);
+  assert.equal(/html\.(?!light)/.test(block), false);
+});
+
 test('the user interface contains no blue or violet accents', () => {
   const userInterface = [
     'src/index.css',

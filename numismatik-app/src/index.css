@@ -336,3 +336,71 @@ html.light .text-stone-950 {
   color: #1c1917 !important;
 }
 
+/* ============= Einheitliche Farbwelt im hellen Modus =============
+   Alle Akzentfarben (Gold, Grün, Orange, Gelb) werden zu einem einzigen
+   Braun-Gold zusammengefasst. Rot bleibt nur für Löschen, Fehler und Verluste.
+   Muss am Ende der hellen Regeln stehen, damit es frühere Zuordnungen ersetzt. */
+html.light {
+  --unified-accent: #8a5a1f;
+  --unified-accent-solid: #9a6a2c;
+  --unified-tint: #f3ead9;
+  --unified-tint-border: #dcc9a6;
+}
+
+/* Getönte Akzentflächen: Abzeichen, Hinweise, Statusfelder */
+html.light [class^="bg-amber-"], html.light [class*=" bg-amber-"],
+html.light [class^="bg-emerald-"], html.light [class*=" bg-emerald-"],
+html.light [class^="bg-orange-"], html.light [class*=" bg-orange-"],
+html.light [class^="bg-yellow-"], html.light [class*=" bg-yellow-"],
+html.light [class^="bg-green-"], html.light [class*=" bg-green-"] {
+  background-color: var(--unified-tint) !important;
+}
+
+/* Getönte Farbverläufe (z.B. Platzhalter ohne Münzbild) */
+html.light body [class*="from-amber-"],
+html.light body [class*="from-emerald-"],
+html.light body [class*="from-orange-"] {
+  background-image: none !important;
+  background-color: var(--unified-tint) !important;
+}
+
+/* Kräftige Hauptknöpfe und eingeschaltete Schalter */
+html.light body .bg-amber-400, html.light body .bg-amber-500,
+html.light body .bg-amber-600, html.light body .bg-amber-700,
+html.light body .bg-amber-800, html.light body .bg-emerald-400,
+html.light body .bg-emerald-500, html.light body .bg-emerald-600,
+html.light body .bg-orange-600,
+html.light body .from-amber-400, html.light body .from-amber-500,
+html.light body .from-amber-600, html.light body .from-emerald-400 {
+  background-image: none !important;
+  background-color: var(--unified-accent-solid) !important;
+  color: #ffffff !important;
+}
+
+/* Akzent-Texte */
+html.light [class^="text-amber-"], html.light [class*=" text-amber-"],
+html.light [class^="text-emerald-"], html.light [class*=" text-emerald-"],
+html.light [class^="text-orange-"], html.light [class*=" text-orange-"],
+html.light [class^="text-yellow-"], html.light [class*=" text-yellow-"],
+html.light [class^="text-green-"], html.light [class*=" text-green-"] {
+  color: var(--unified-accent) !important;
+}
+
+/* Inhalt der kräftigen Knöpfe bleibt weiss lesbar */
+html.light body :is(
+  .bg-amber-400, .bg-amber-500, .bg-amber-600, .bg-amber-700, .bg-amber-800,
+  .bg-emerald-400, .bg-emerald-500, .bg-emerald-600, .bg-orange-600,
+  .from-amber-400, .from-amber-500, .from-amber-600, .from-emerald-400
+) * {
+  color: inherit !important;
+}
+
+/* Akzent-Ränder */
+html.light [class^="border-amber-"], html.light [class*=" border-amber-"],
+html.light [class^="border-emerald-"], html.light [class*=" border-emerald-"],
+html.light [class^="border-orange-"], html.light [class*=" border-orange-"],
+html.light [class^="border-yellow-"], html.light [class*=" border-yellow-"],
+html.light [class^="border-green-"], html.light [class*=" border-green-"] {
+  border-color: var(--unified-tint-border) !important;
+}
+
