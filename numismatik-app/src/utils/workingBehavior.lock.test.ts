@@ -99,6 +99,17 @@ test('light mode uses one unified accent colour after all other light rules', ()
   assert.equal(/html\.(?!light)/.test(block), false);
 });
 
+test('the full-screen coin picture can always be closed on the iPhone', () => {
+  const detail = source('src/components/CoinDetailModal.tsx');
+  const lightbox = detail.slice(detail.indexOf('High-Res Fullscreen Lightbox'));
+  assert.match(lightbox, /z-\[60\]/);
+  assert.match(lightbox, /env\(safe-area-inset-top\)/);
+  assert.match(lightbox, /lightbox-close shrink-0 flex items-center justify-center w-11 h-11/);
+  assert.match(lightbox, /e\.target === e\.currentTarget\) setFullscreenImage\(null\)/);
+  assert.match(lightbox, />\s*Schliessen\s*<\/button>/);
+  assert.equal((lightbox.match(/setFullscreenImage\(null\)/g) || []).length >= 3, true);
+});
+
 test('the user interface contains no blue or violet accents', () => {
   const userInterface = [
     'src/index.css',

@@ -485,59 +485,76 @@ export const CoinDetailModal: React.FC<CoinDetailModalProps> = ({
 
       {/* High-Res Fullscreen Lightbox Zoom Modal */}
       {fullscreenImage && (
-        <div className="fixed inset-0 z-50 flex flex-col bg-slate-950/95 backdrop-blur-xl animate-fadeIn p-4 overflow-hidden">
+        <div
+          role="dialog"
+          aria-modal="true"
+          className="image-lightbox fixed inset-0 z-[60] flex flex-col bg-slate-950/95 backdrop-blur-xl animate-fadeIn overflow-hidden px-3 pt-[max(0.75rem,env(safe-area-inset-top))] pb-[max(0.75rem,env(safe-area-inset-bottom))]"
+        >
           {/* Lightbox Toolbar */}
-          <div className="flex items-center justify-between bg-slate-900/90 border border-slate-800 px-6 py-3 rounded-2xl mb-4 text-slate-100 z-10">
-            <h3 className="text-sm font-semibold text-amber-300 font-serif truncate mr-4">
-              {fullscreenImage.title}
-            </h3>
+          <div className="shrink-0 flex flex-col gap-2 bg-slate-900/90 border border-slate-800 px-3 py-2.5 rounded-2xl mb-3 text-slate-100 z-10">
+            <div className="flex items-center justify-between gap-3">
+              <h3 className="min-w-0 text-sm font-semibold text-amber-300 font-serif truncate">
+                {fullscreenImage.title}
+              </h3>
+              <button
+                onClick={() => setFullscreenImage(null)}
+                className="lightbox-close shrink-0 flex items-center justify-center w-11 h-11 rounded-xl bg-amber-500 text-slate-950 hover:bg-amber-400 font-bold transition-colors"
+                title="Schließen"
+                aria-label="Schließen"
+              >
+                <X className="w-6 h-6 shrink-0" />
+              </button>
+            </div>
 
-            <div className="flex items-center space-x-2">
-              <button
-                onClick={() => setZoomLevel(prev => Math.max(0.5, prev - 0.3))}
-                className="p-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 transition-colors"
-                title="Verkleinern"
-              >
-                <ZoomOut className="w-4 h-4" />
-              </button>
-              <span className="text-xs font-mono text-amber-400 w-12 text-center font-bold">
-                {Math.round(zoomLevel * 100)}%
-              </span>
-              <button
-                onClick={() => setZoomLevel(prev => Math.min(4, prev + 0.3))}
-                className="p-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 transition-colors"
-                title="Vergrößern"
-              >
-                <ZoomIn className="w-4 h-4" />
-              </button>
-              <button
-                onClick={() => setRotation(prev => (prev + 90) % 360)}
-                className="p-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 transition-colors ml-2"
-                title="90° Drehen"
-              >
-                <RotateCw className="w-4 h-4" />
-              </button>
+            <div className="flex items-center justify-between gap-2">
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => setZoomLevel(prev => Math.max(0.5, prev - 0.3))}
+                  className="shrink-0 flex items-center justify-center w-11 h-11 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 transition-colors"
+                  title="Verkleinern"
+                  aria-label="Verkleinern"
+                >
+                  <ZoomOut className="w-5 h-5 shrink-0" />
+                </button>
+                <span className="shrink-0 text-xs font-mono text-amber-400 w-12 text-center font-bold whitespace-nowrap">
+                  {Math.round(zoomLevel * 100)}%
+                </span>
+                <button
+                  onClick={() => setZoomLevel(prev => Math.min(4, prev + 0.3))}
+                  className="shrink-0 flex items-center justify-center w-11 h-11 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 transition-colors"
+                  title="Vergrößern"
+                  aria-label="Vergrößern"
+                >
+                  <ZoomIn className="w-5 h-5 shrink-0" />
+                </button>
+                <button
+                  onClick={() => setRotation(prev => (prev + 90) % 360)}
+                  className="shrink-0 flex items-center justify-center w-11 h-11 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 transition-colors"
+                  title="90° Drehen"
+                  aria-label="90° Drehen"
+                >
+                  <RotateCw className="w-5 h-5 shrink-0" />
+                </button>
+              </div>
               <button
                 onClick={() => {
                   setZoomLevel(1);
                   setRotation(0);
                 }}
-                className="px-3 py-1.5 text-xs rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 transition-colors"
+                className="shrink-0 h-11 px-3 text-xs rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 transition-colors whitespace-nowrap"
               >
                 Zurücksetzen
-              </button>
-              <button
-                onClick={() => setFullscreenImage(null)}
-                className="p-2 rounded-lg bg-amber-500 text-slate-950 hover:bg-amber-400 font-bold transition-colors ml-4"
-                title="Schließen"
-              >
-                <X className="w-5 h-5" />
               </button>
             </div>
           </div>
 
-          {/* Lightbox Image Container */}
-          <div className="flex-1 flex items-center justify-center overflow-auto p-4 cursor-grab">
+          {/* Tippen neben das Bild schliesst die Ansicht. */}
+          <div
+            className="flex-1 min-h-0 flex items-center justify-center overflow-auto p-2"
+            onClick={e => {
+              if (e.target === e.currentTarget) setFullscreenImage(null);
+            }}
+          >
             <img
               src={fullscreenImage.url}
               alt={fullscreenImage.title}
@@ -546,9 +563,16 @@ export const CoinDetailModal: React.FC<CoinDetailModalProps> = ({
                 transform: `scale(${zoomLevel}) rotate(${rotation}deg)`,
                 transition: 'transform 0.2s ease-out'
               }}
-              className="max-h-[80vh] max-w-[90vw] object-contain rounded-full shadow-2xl border-4 border-amber-500/40 select-none"
+              className="max-h-full max-w-full object-contain rounded-full shadow-2xl border-4 border-amber-500/40 select-none"
             />
           </div>
+
+          <button
+            onClick={() => setFullscreenImage(null)}
+            className="shrink-0 mt-3 w-full h-12 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-100 text-sm font-semibold transition-colors"
+          >
+            Schliessen
+          </button>
         </div>
       )}
     </>
