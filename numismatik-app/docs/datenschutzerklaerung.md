@@ -69,9 +69,9 @@ Diese Angaben werden auf unserem Server geprüft und gespeichert, damit das Abon
 
 Für die KI-Funktion, die Prüfung der Abonnements und die Kontolöschung betreiben wir einen Server bei Render Services, Inc. Dabei fallen technisch notwendige Verbindungsdaten an (IP-Adresse, Zeitpunkt, angefragte Funktion, Fehlerprotokolle).
 
-## 10. Optionaler Import
+## 10. Import
 
-Benutzer können Münzen aus CSV-Dateien oder Fotos importieren; dies geschieht auf dem Gerät. Für den optionalen automatischen Import aus Google Drive kann der Dienst Make (Celonis) eingesetzt werden, der die Import-Daten an unseren Server übermittelt.
+Benutzer können Münzen aus CSV-Dateien oder Fotos importieren. Der Import geschieht auf dem Gerät.
 
 ## 11. Website inumis.app
 
@@ -85,7 +85,6 @@ Beim Besuch der Website werden technisch notwendige Daten bearbeitet (IP-Adresse
 | OpenAI | KI-Münzerkennung |
 | Render Services, Inc. | Server |
 | Apple | App Store, Anmeldung mit Apple, In-App-Käufe |
-| Make (Celonis) | optionaler automatischer Import |
 
 Diese Dienstleister können Daten auch ausserhalb der Schweiz, insbesondere in den USA, bearbeiten. Die Übermittlung stützt sich, soweit vorhanden, auf das Swiss-U.S. Data Privacy Framework bzw. das EU-U.S. Data Privacy Framework oder auf Standardvertragsklauseln.
 
