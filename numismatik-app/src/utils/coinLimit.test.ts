@@ -164,3 +164,8 @@ test('the server limits AI requests per month: 30 free, 1000 with Pro, unlimited
   const form = source('src/components/CoinFormModal.tsx');
   assert.equal((form.match(/\$\{aiQuotaNotice\(res\)\}/g) || []).length, 2);
 });
+
+test('new email accounts get a German confirmation mail without blocking registration', () => {
+  const authContext = source('src/context/AuthContext.tsx');
+  assert.match(authContext, /const credential = await createUserWithEmailAndPassword\(auth, cleanEmail, pass\);\n\s*\/\/[^\n]*\n\s*try \{\n\s*auth\.languageCode = 'de';\n\s*await sendEmailVerification\(credential\.user\);\n\s*\} catch/);
+});

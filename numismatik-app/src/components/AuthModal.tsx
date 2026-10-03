@@ -83,7 +83,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
     try {
       if (isRegisterMode) {
         await registerWithEmail(trimmedEmail, password);
-        setSuccessMsg('Registrierung erfolgreich! Ihre Münzsammlung ist jetzt sicher in der Cloud.');
+        setSuccessMsg(`Registrierung erfolgreich! Wir haben eine Bestätigungs-Mail an ${trimmedEmail} gesendet. Bitte prüfen Sie auch Ihren Spam-Ordner.`);
       } else {
         await loginWithEmail(trimmedEmail, password);
         setSuccessMsg('Erfolgreich angemeldet!');
@@ -136,7 +136,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
     const trimmedEmail = email.trim().toLowerCase();
     try {
       await registerWithEmail(trimmedEmail, password);
-      setSuccessMsg('Konto erfolgreich erstellt! Sie sind nun angemeldet.');
+      setSuccessMsg(`Konto erstellt und angemeldet. Wir haben eine Bestätigungs-Mail an ${trimmedEmail} gesendet. Bitte prüfen Sie auch Ihren Spam-Ordner.`);
       if (onSyncLocalData) onSyncLocalData();
       setTimeout(() => onClose(), 1200);
     } catch (err: any) {

@@ -7,6 +7,7 @@ import {
   reauthenticateWithCredential,
   reauthenticateWithPopup,
   sendPasswordResetEmail,
+  sendEmailVerification,
   GoogleAuthProvider,
   OAuthProvider,
   signInWithCredential,
@@ -103,7 +104,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const registerWithEmail = async (email: string, pass: string) => {
     const cleanEmail = email.trim().toLowerCase();
-    await createUserWithEmailAndPassword(auth, cleanEmail, pass);
+    const credential = await createUserWithEmailAndPassword(auth, cleanEmail, pass);
+    // Die Bestätigungs-Mail darf die Registrierung nie blockieren; das Konto ist sofort nutzbar.
+    try {
+      auth.languageCode = 'de';
+      await sendEmailVerification(credential.user);
+    } catch (error) {
+      console.warn('Bestätigungs-Mail konnte nicht gesendet werden:', error);
+    }
   };
 
   const resetPassword = async (email: string) => {
