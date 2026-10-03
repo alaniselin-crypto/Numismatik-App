@@ -188,7 +188,7 @@ export const CoinDetailModal: React.FC<CoinDetailModalProps> = ({
                 </span>
                 <span className="flex items-center gap-1.5 font-mono text-slate-100 bg-slate-800/80 px-3 py-1 rounded-lg border border-slate-700/60">
                   <Calendar className="w-4 h-4 text-amber-400" />
-                  Jahrgang {coin.year}
+                  Jahrgang {coin.year || '–'}
                 </span>
                 {coin.catalogNumber && (
                   <span className="flex items-center gap-1.5 font-mono font-bold text-amber-200 bg-amber-500/10 px-3 py-1 rounded-lg border border-amber-500/30">

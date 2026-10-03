@@ -526,6 +526,10 @@ export function getConditionLabel(condition: string): { label: string; full: str
       return { label: 's', full: 'Schön', color: 'bg-slate-500/20 text-slate-300 border-slate-500/40' };
     case 'ge':
       return { label: 'ge', full: 'Gering erhalten', color: 'bg-rose-500/20 text-rose-300 border-rose-500/40' };
+    case '':
+    case undefined:
+    case null:
+      return { label: '–', full: 'Keine Angabe', color: 'bg-slate-500/20 text-slate-300 border-slate-500/40' };
     default:
       return { label: condition, full: condition, color: 'bg-slate-500/20 text-slate-300 border-slate-500/40' };
   }

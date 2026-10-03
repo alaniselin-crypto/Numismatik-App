@@ -118,8 +118,12 @@ export const CoinCard: React.FC<CoinCardProps> = ({
                   </span>
                 )}
                 <span>{coin.country}</span>
-                <span>•</span>
-                <span>{coin.year}</span>
+                {coin.year ? (
+                  <>
+                    <span>•</span>
+                    <span>{coin.year}</span>
+                  </>
+                ) : null}
                 {coin.storageLocation && (
                   <>
                     <span>•</span>
@@ -262,7 +266,7 @@ export const CoinCard: React.FC<CoinCardProps> = ({
               <span>•</span>
               <span className="flex items-center gap-1 font-mono text-slate-300">
                 <Calendar className="w-3 h-3 text-amber-500/80" />
-                {coin.year}
+                {coin.year || '–'}
               </span>
             </div>
           </div>

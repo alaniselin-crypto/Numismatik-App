@@ -4,6 +4,8 @@ import { Coin, CoinCondition, CustomFieldDefinition } from '../types';
 import { AutoCoinPreview } from './AutoCoinPreview';
 import { formatSKU } from '../utils/storage';
 import { fullSizePhotoUrl } from '../utils/coinPhotoUrls';
+import { loadAutoAiRecognition, wakeAiServer } from '../utils/aiAssist';
+import { compressDataUrlIfNeeded } from '../utils/firestoreStorage';
 import { WORLD_COUNTRIES, POPULAR_COIN_COUNTRIES } from '../data/countries';
 import { POPULAR_CURRENCIES } from '../data/currencies';
 import { RARITY_OPTIONS } from '../data/rarities';
@@ -41,13 +43,21 @@ async function requestAiCoinInfo(payload: Record<string, unknown>) {
     throw new Error('Für die KI-Erkennung ist eine Anmeldung erforderlich.');
   }
   const idToken = await currentUser.getIdToken();
+  // Kleinere Bilder für die KI: schnellere Übertragung, gleiche Erkennungsqualität.
+  const smallerPayload = { ...payload };
+  for (const key of ['imageUrl', 'reverseImageUrl'] as const) {
+    const value = smallerPayload[key];
+    if (typeof value === 'string' && value.startsWith('data:image/')) {
+      smallerPayload[key] = await compressDataUrlIfNeeded(value, 1024, 0.8, 200 * 1024);
+    }
+  }
   return fetch(AI_COIN_INFO_URL, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
       Authorization: `Bearer ${idToken}`
     },
-    body: JSON.stringify(payload)
+    body: JSON.stringify(smallerPayload)
   });
 }
 
@@ -89,13 +99,13 @@ export const CoinFormModal: React.FC<CoinFormModalProps> = ({
     catalogNumber: initialCoin?.catalogNumber || nextCatalogNumber || '',
     itemType: (initialCoin?.itemType || 'coin') as 'coin' | 'banknote',
     quantity: initialCoin?.quantity || 1,
-    rarity: initialCoin?.rarity || 'A - Häufig',
+    rarity: initialCoin?.rarity || '',
     name: '',
     country: '',
     faceValue: '1',
     currency: 'CHF',
-    year: new Date().getFullYear(),
-    condition: 'vz' as CoinCondition,
+    year: 0,
+    condition: '' as CoinCondition,
     purchasePrice: 0,
     currentValue: 0,
     purchaseDate: new Date().toISOString().split('T')[0],
@@ -128,13 +138,13 @@ export const CoinFormModal: React.FC<CoinFormModalProps> = ({
         catalogNumber: initialCoin.catalogNumber || '',
         itemType: initialCoin.itemType || 'coin',
         quantity: initialCoin.quantity || 1,
-        rarity: initialCoin.rarity || 'A - Häufig',
+        rarity: initialCoin.rarity || '',
         name: initialCoin.name || '',
         country: initialCoin.country || '',
         faceValue: initialCoin.faceValue || '1',
         currency: initialCoin.currency || 'CHF',
-        year: initialCoin.year || new Date().getFullYear(),
-        condition: initialCoin.condition || 'vz',
+        year: initialCoin.year || 0,
+        condition: initialCoin.condition || ('' as CoinCondition),
         purchasePrice: initialCoin.purchasePrice || 0,
         currentValue: initialCoin.currentValue || 0,
         purchaseDate: initialCoin.purchaseDate || new Date().toISOString().split('T')[0],
@@ -162,13 +172,13 @@ export const CoinFormModal: React.FC<CoinFormModalProps> = ({
         catalogNumber: nextCatalogNumber ? formatSKU(nextCatalogNumber) : '',
         itemType: 'coin',
         quantity: 1,
-        rarity: 'A - Häufig',
+        rarity: '',
         name: '',
         country: '',
         faceValue: '1',
         currency: 'CHF',
-        year: new Date().getFullYear(),
-        condition: 'vz',
+        year: 0,
+        condition: '' as CoinCondition,
         purchasePrice: 0,
         currentValue: 0,
         purchaseDate: new Date().toISOString().split('T')[0],
@@ -201,6 +211,18 @@ export const CoinFormModal: React.FC<CoinFormModalProps> = ({
   const [isAiNotesGenerating, setIsAiNotesGenerating] = useState(false);
   const [aiSuccess, setAiSuccess] = useState<string | null>(null);
   const [aiRecognitionNotice, setAiRecognitionNotice] = useState<string | null>(null);
+  const [autoAiEnabled, setAutoAiEnabled] = useState(false);
+  const [autoAiPending, setAutoAiPending] = useState(false);
+  const photosPickedRef = useRef(false);
+  const lastAutoAiKeyRef = useRef('');
+
+  useEffect(() => {
+    if (!isOpen) return;
+    setAutoAiEnabled(loadAutoAiRecognition());
+    photosPickedRef.current = false;
+    lastAutoAiKeyRef.current = '';
+    wakeAiServer();
+  }, [isOpen]);
   const [uploadingField, setUploadingField] = useState<'imageUrl' | 'reverseImageUrl' | null>(null);
 
   const handleAiGenerate = async () => {
@@ -253,6 +275,24 @@ export const CoinFormModal: React.FC<CoinFormModalProps> = ({
       setIsAiGenerating(false);
     }
   };
+
+  // Automatische Erkennung: sofort wenn beide Seiten gewählt sind, sonst 15 s nach dem ersten Foto.
+  useEffect(() => {
+    if (!isOpen || !autoAiEnabled || !photosPickedRef.current || isAiGenerating) return;
+    if (!formData.imageUrl && !formData.reverseImageUrl) return;
+    const photoKey = `${formData.imageUrl.length}:${formData.imageUrl.slice(-48)}|${formData.reverseImageUrl.length}:${formData.reverseImageUrl.slice(-48)}`;
+    if (photoKey === lastAutoAiKeyRef.current) return;
+    setAutoAiPending(true);
+    const timer = setTimeout(() => {
+      lastAutoAiKeyRef.current = photoKey;
+      setAutoAiPending(false);
+      void handleAiGenerate();
+    }, formData.imageUrl && formData.reverseImageUrl ? 400 : 15000);
+    return () => {
+      clearTimeout(timer);
+      setAutoAiPending(false);
+    };
+  }, [isOpen, autoAiEnabled, isAiGenerating, formData.imageUrl, formData.reverseImageUrl]);
 
   const handleAiNotesGenerate = async () => {
     setIsAiNotesGenerating(true);
@@ -401,6 +441,8 @@ export const CoinFormModal: React.FC<CoinFormModalProps> = ({
 
           // Compress to lightweight JPEG data url (~50-80KB)
           const compressedDataUrl = canvas.toDataURL('image/jpeg', 0.88);
+          photosPickedRef.current = true;
+          wakeAiServer();
           setFormData(prev => ({
             ...prev,
             [targetField]: compressedDataUrl,
@@ -686,7 +728,7 @@ export const CoinFormModal: React.FC<CoinFormModalProps> = ({
                     onChange={e => setFormData({ ...formData, rarity: e.target.value })}
                     className="w-full px-3.5 py-2.5 rounded-xl bg-slate-900 border border-slate-800 text-sm text-amber-300 font-semibold focus:outline-none focus:ring-2 focus:ring-amber-500/50 cursor-pointer"
                   >
-                    <option value="" disabled>-- Seltenheit auswählen --</option>
+                    <option value="">– Keine Angabe –</option>
                     {RARITY_OPTIONS.map(opt => (
                       <option key={opt.code} value={opt.fullLabel}>
                         {opt.fullLabel}
@@ -731,6 +773,13 @@ export const CoinFormModal: React.FC<CoinFormModalProps> = ({
                   }`}
                 />
                 {errors.name && <p className="text-xs font-bold text-rose-400 mt-1">{errors.name}</p>}
+                {autoAiPending && !isAiGenerating && (
+                  <p role="status" className="text-xs text-amber-300">
+                    {formData.imageUrl && formData.reverseImageUrl
+                      ? 'Automatische KI-Erkennung startet …'
+                      : 'Automatische KI-Erkennung startet in wenigen Sekunden – oder sofort, sobald beide Seiten gewählt sind.'}
+                  </p>
+                )}
                 {aiRecognitionNotice && (
                   <div role="status" className="p-3 rounded-xl bg-emerald-500/15 border border-emerald-500/40 text-emerald-300 text-xs font-semibold flex items-center gap-2">
                     <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
@@ -791,7 +840,7 @@ export const CoinFormModal: React.FC<CoinFormModalProps> = ({
 
               <div>
                 <label className="block text-xs font-bold text-amber-300 mb-1">
-                  Prägejahr * <span className="text-[10px] text-rose-400 font-normal">(Pflichtfeld)</span>
+                  Prägejahr
                 </label>
                 <input
                   type="number"
@@ -876,13 +925,14 @@ export const CoinFormModal: React.FC<CoinFormModalProps> = ({
 
               <div className="sm:col-span-2">
                 <label className="block text-xs font-medium text-slate-300 mb-1">
-                  Erhaltungsgrad *
+                  Erhaltungsgrad
                 </label>
                 <select
                   value={formData.condition}
                   onChange={e => setFormData({ ...formData, condition: e.target.value as CoinCondition })}
                   className="w-full px-3.5 py-2.5 rounded-xl bg-slate-900 border border-slate-800 text-sm text-amber-300 focus:outline-none focus:ring-2 focus:ring-amber-500/50"
                 >
+                  <option value="">– Keine Angabe –</option>
                   {CONDITION_OPTIONS.map(opt => (
                     <option key={opt.value} value={opt.value}>
                       {opt.label}

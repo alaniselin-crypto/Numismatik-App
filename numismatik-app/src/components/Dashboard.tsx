@@ -173,7 +173,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
               </div>
               <div className="text-xs text-stone-400 mt-2 flex items-center justify-between border-t border-[#3e2e26] pt-2">
                 <span>{topCoin.country}</span>
-                <span className="font-mono text-stone-300">{topCoin.year}</span>
+                <span className="font-mono text-stone-300">{topCoin.year || ''}</span>
               </div>
             </div>
           ) : (
@@ -310,7 +310,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
                       {coin.name}
                     </h4>
                     <span className="text-[10px] text-stone-400">
-                      {coin.country} ({coin.year})
+                      {coin.country}{coin.year ? ` (${coin.year})` : ''}
                     </span>
                   </div>
                 </div>

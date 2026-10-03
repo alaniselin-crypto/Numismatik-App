@@ -188,3 +188,46 @@ test('after deleting the account the login page confirms the deletion', () => {
   assert.match(login, /hasAccountDeletedNotice\(\)\n\s*\? \{ type: 'success', text: 'Ihr Konto, Ihre Sammlung und alle Fotos wurden dauerhaft gelöscht\.' \}/);
   assert.match(login, /useEffect\(\(\) => \{\n\s*clearAccountDeletedNotice\(\);\n\s*\}, \[\]\);/);
 });
+
+test('new coins start without rarity, year and condition', () => {
+  const form = source('src/components/CoinFormModal.tsx');
+  assert.doesNotMatch(form, /rarity: (initialCoin\??\.rarity \|\| )?'A - Häufig'/);
+  assert.doesNotMatch(form, /year: (initialCoin\.year \|\| )?new Date\(\)\.getFullYear\(\)/);
+  assert.doesNotMatch(form, /condition: (initialCoin\.condition \|\| )?'vz'/);
+  assert.equal((form.match(/<option value="">– Keine Angabe –<\/option>/g) || []).length, 2);
+  assert.doesNotMatch(form, /Prägejahr \*/);
+  const storage = source('src/utils/storage.ts');
+  assert.match(storage, /case '':\n\s*case undefined:\n\s*case null:\n\s*return \{ label: '–', full: 'Keine Angabe'/);
+  for (const file of ['src/components/CoinCard.tsx', 'src/components/CoinDetailModal.tsx', 'src/components/Dashboard.tsx', 'src/components/CoinList.tsx']) {
+    assert.doesNotMatch(source(file), /\(\{coin\.year\}\)|Jahrgang \{coin\.year\}<|<span>\{coin\.year\}<\/span>\n\s*\{coin\.storageLocation/, file);
+  }
+});
+
+test('automatic coin recognition can be switched on in the settings', () => {
+  const header = source('src/components/Header.tsx');
+  assert.match(header, /Münzen automatisch erkennen/);
+  assert.match(header, /saveAutoAiRecognition\(event\.target\.checked\)/);
+  const form = source('src/components/CoinFormModal.tsx');
+  assert.match(form, /setAutoAiEnabled\(loadAutoAiRecognition\(\)\)/);
+  assert.match(form, /if \(!isOpen \|\| !autoAiEnabled \|\| !photosPickedRef\.current \|\| isAiGenerating\) return;/);
+  assert.match(form, /formData\.imageUrl && formData\.reverseImageUrl \? 400 : 15000/);
+  assert.match(form, /photosPickedRef\.current = true;/);
+});
+
+test('the AI server is woken early and receives smaller pictures', async () => {
+  const { wakeAiServer } = await import('./aiAssist');
+  const calls: string[] = [];
+  const originalFetch = globalThis.fetch;
+  globalThis.fetch = (async (url: string) => { calls.push(String(url)); return new Response(null); }) as typeof fetch;
+  try {
+    assert.equal(wakeAiServer(1_000_000_000), true);
+    assert.equal(wakeAiServer(1_000_000_000 + 60_000), false);
+    assert.equal(wakeAiServer(1_000_000_000 + 6 * 60_000), true);
+    assert.deepEqual(calls, ['https://inumis-node-backend.onrender.com/', 'https://inumis-node-backend.onrender.com/']);
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
+  const form = source('src/components/CoinFormModal.tsx');
+  assert.match(form, /compressDataUrlIfNeeded\(value, 1024, 0\.8, 200 \* 1024\)/);
+  assert.match(source('src/App.tsx'), /if \(userUid\) wakeAiServer\(\);/);
+});

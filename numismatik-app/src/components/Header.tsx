@@ -1,10 +1,11 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { HelpCircle, Folder, ShoppingBag, Cloud, UserCheck, Settings, ChevronDown, LogIn, Crown, ListPlus, Sun, Moon, CloudUpload, CloudOff, Trash2 } from 'lucide-react';
+import { HelpCircle, Folder, ShoppingBag, Cloud, UserCheck, Settings, ChevronDown, LogIn, Crown, ListPlus, Sun, Moon, CloudUpload, CloudOff, Trash2, Sparkles } from 'lucide-react';
 import { formatCurrency } from '../utils/storage';
 import { getStoredTheme, setTheme, applyTheme, type ThemeMode } from '../utils/theme';
 import { connectDrive, disconnectDrive, driveStatus, driveSupported } from '../utils/googleDrive';
 import logoImg from '../assets/logo.png';
 import { useAuth } from '../context/AuthContext';
+import { loadAutoAiRecognition, saveAutoAiRecognition } from '../utils/aiAssist';
 
 interface HeaderProps {
   totalValue: number;
@@ -43,6 +44,7 @@ export const Header: React.FC<HeaderProps> = ({
   const { user } = useAuth();
   const [isSettingsOpen, setIsSettingsOpen] = useState<boolean>(false);
   const [showClearConfirmation, setShowClearConfirmation] = useState<boolean>(false);
+  const [autoAiRecognition, setAutoAiRecognition] = useState<boolean>(() => loadAutoAiRecognition());
   const dropdownRef = useRef<HTMLDivElement>(null);
   const [themeMode, setThemeMode] = useState<ThemeMode>(() => getStoredTheme());
   useEffect(() => {
@@ -239,6 +241,23 @@ export const Header: React.FC<HeaderProps> = ({
                     </div>
                   </button>
                 )}
+
+                <label className="w-full flex items-center gap-2.5 px-3 py-2 text-xs text-stone-200 hover:bg-[#322722] transition-colors cursor-pointer">
+                  <Sparkles className="w-4 h-4 text-amber-400 shrink-0" />
+                  <div className="flex-1 min-w-0">
+                    <div className="font-medium">Münzen automatisch erkennen</div>
+                    <div className="text-[10px] text-stone-400">KI startet selbst, sobald Fotos gewählt sind</div>
+                  </div>
+                  <input
+                    type="checkbox"
+                    className="auto-ai-checkbox h-5 w-5 shrink-0 cursor-pointer accent-amber-600"
+                    checked={autoAiRecognition}
+                    onChange={event => {
+                      setAutoAiRecognition(event.target.checked);
+                      saveAutoAiRecognition(event.target.checked);
+                    }}
+                  />
+                </label>
 
                 {onOpenAuthModal && (
                   <button

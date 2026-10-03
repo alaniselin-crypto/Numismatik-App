@@ -674,7 +674,7 @@ export const CoinList: React.FC<CoinListProps> = ({
                   <td className="p-2 border border-gray-300">{coin.itemType === 'banknote' ? 'Banknote' : 'Münze'}</td>
                   <td className="p-2 border border-gray-300 font-bold">{coin.quantity || 1}</td>
                   <td className="p-2 border border-gray-300 font-bold">{coin.name}</td>
-                  <td className="p-2 border border-gray-300">{coin.country} ({coin.year})</td>
+                  <td className="p-2 border border-gray-300">{coin.country}{coin.year ? ` (${coin.year})` : ''}</td>
                   <td className="p-2 border border-gray-300">{coin.faceValue} {coin.currency}</td>
                   <td className="p-2 border border-gray-300">{coin.condition}</td>
                   <td className="p-2 border border-gray-300 font-semibold">{rarityOpt ? rarityOpt.fullLabel : (coin.rarity || '-')}</td>

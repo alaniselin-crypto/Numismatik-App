@@ -85,6 +85,7 @@ import { LoginPage } from './components/LoginPage';
 import { AppInfoModal } from './components/AppInfoModal';
 import { HeroDownloadModal } from './components/HeroDownloadModal';
 import { isAdminUser, setLocalAdmin } from './utils/admin';
+import { wakeAiServer } from './utils/aiAssist';
 import {
   FREE_COIN_LIMIT,
   StoredProEntitlement,
@@ -150,6 +151,10 @@ export default function App() {
   coinsRef.current = coins;
   foldersRef.current = folders;
   platformsRef.current = platforms;
+
+  useEffect(() => {
+    if (userUid) wakeAiServer();
+  }, [userUid]);
 
   useEffect(() => {
     setProEntitlement(loadProEntitlement(userUid));
