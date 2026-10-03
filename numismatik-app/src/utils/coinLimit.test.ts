@@ -169,3 +169,14 @@ test('new email accounts get a German confirmation mail without blocking registr
   const authContext = source('src/context/AuthContext.tsx');
   assert.match(authContext, /const credential = await createUserWithEmailAndPassword\(auth, cleanEmail, pass\);\n\s*\/\/[^\n]*\n\s*try \{\n\s*auth\.languageCode = 'de';\n\s*await sendEmailVerification\(credential\.user\);\n\s*\} catch/);
 });
+
+test('AI success messages appear right next to their buttons on the phone', () => {
+  const form = source('src/components/CoinFormModal.tsx');
+  const nameButton = form.indexOf('onClick={handleAiGenerate}');
+  const nameNotice = form.indexOf('{aiRecognitionNotice && (');
+  assert.ok(nameButton > 0 && nameNotice > nameButton && nameNotice - nameButton < 2500);
+  const notesButton = form.indexOf('onClick={handleAiNotesGenerate}');
+  const notesNotice = form.indexOf('{aiSuccess && (');
+  assert.ok(notesButton > 0 && notesNotice > notesButton && notesNotice - notesButton < 2500);
+  assert.equal(form.includes('KI Banner Notification'), false);
+});

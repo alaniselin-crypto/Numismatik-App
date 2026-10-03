@@ -200,6 +200,7 @@ export const CoinFormModal: React.FC<CoinFormModalProps> = ({
   const [isAiGenerating, setIsAiGenerating] = useState(false);
   const [isAiNotesGenerating, setIsAiNotesGenerating] = useState(false);
   const [aiSuccess, setAiSuccess] = useState<string | null>(null);
+  const [aiRecognitionNotice, setAiRecognitionNotice] = useState<string | null>(null);
   const [uploadingField, setUploadingField] = useState<'imageUrl' | 'reverseImageUrl' | null>(null);
 
   const handleAiGenerate = async () => {
@@ -210,6 +211,7 @@ export const CoinFormModal: React.FC<CoinFormModalProps> = ({
 
     setIsAiGenerating(true);
     setAiSuccess(null);
+    setAiRecognitionNotice(null);
     try {
       const res = await requestAiCoinInfo({
         imageUrl: initialCoin && formData.imageUrl === initialCoin.imageUrl ? fullSizePhotoUrl(initialCoin, 'front') : formData.imageUrl,
@@ -243,8 +245,8 @@ export const CoinFormModal: React.FC<CoinFormModalProps> = ({
         currentValue: recognizedValue ?? prev.currentValue,
         notes: (!prev.notes || prev.notes === 'Keine') && data.description ? data.description : prev.notes
       }));
-      setAiSuccess(`✨ KI-Erkennung erfolgreich: Seltenheit, Erhaltung, Verkaufswert und Material wurden übernommen.${aiQuotaNotice(res)}`);
-      setTimeout(() => setAiSuccess(null), 6000);
+      setAiRecognitionNotice(`✨ KI-Erkennung erfolgreich: Seltenheit, Erhaltung, Verkaufswert und Material wurden übernommen.${aiQuotaNotice(res)}`);
+      setTimeout(() => setAiRecognitionNotice(null), 12000);
     } catch (err: any) {
       alert(err.message || 'Fehler bei der KI-Generierung');
     } finally {
@@ -283,7 +285,7 @@ export const CoinFormModal: React.FC<CoinFormModalProps> = ({
           notes: text
         }));
         setAiSuccess(`✨ Bemerkungen wurden erfolgreich von KI verfasst!${aiQuotaNotice(res)}`);
-        setTimeout(() => setAiSuccess(null), 6000);
+        setTimeout(() => setAiSuccess(null), 12000);
       }
     } catch (err: any) {
       alert(err.message || 'Fehler bei der KI-Generierung');
@@ -729,6 +731,12 @@ export const CoinFormModal: React.FC<CoinFormModalProps> = ({
                   }`}
                 />
                 {errors.name && <p className="text-xs font-bold text-rose-400 mt-1">{errors.name}</p>}
+                {aiRecognitionNotice && (
+                  <div role="status" className="p-3 rounded-xl bg-emerald-500/15 border border-emerald-500/40 text-emerald-300 text-xs font-semibold flex items-center gap-2">
+                    <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
+                    <span>{aiRecognitionNotice}</span>
+                  </div>
+                )}
               </div>
 
               <div>
@@ -905,13 +913,6 @@ export const CoinFormModal: React.FC<CoinFormModalProps> = ({
             </div>
           )}
 
-          {/* KI Banner Notification */}
-          {aiSuccess && (
-            <div className="p-3.5 rounded-xl bg-emerald-500/15 border border-emerald-500/40 text-emerald-300 text-xs font-semibold flex items-center gap-2 animate-in fade-in">
-              <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
-              <span>{aiSuccess}</span>
-            </div>
-          )}
 
           {/* Section 2: Preise & Werterfassung */}
           <div>
@@ -1369,6 +1370,12 @@ export const CoinFormModal: React.FC<CoinFormModalProps> = ({
                   placeholder="Ausführliche Bemerkungen, KI-generierte Beschreibung, Historie, Erhaltungsmerkmale, Auktionsnotizen..."
                   className="w-full px-3.5 py-2.5 rounded-xl bg-slate-900 border border-slate-800 text-sm text-slate-100 focus:outline-none focus:ring-2 focus:ring-amber-500/50 leading-relaxed"
                 />
+                {aiSuccess && (
+                  <div role="status" className="mt-2 p-3 rounded-xl bg-emerald-500/15 border border-emerald-500/40 text-emerald-300 text-xs font-semibold flex items-center gap-2">
+                    <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
+                    <span>{aiSuccess}</span>
+                  </div>
+                )}
               </div>
 
               {(onOpenCustomFields || customFieldDefs.length > 0) && (
