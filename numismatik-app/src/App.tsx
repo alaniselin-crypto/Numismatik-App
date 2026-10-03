@@ -85,7 +85,9 @@ import { LoginPage } from './components/LoginPage';
 import { AppInfoModal } from './components/AppInfoModal';
 import { HeroDownloadModal } from './components/HeroDownloadModal';
 import { isAdminUser, setLocalAdmin } from './utils/admin';
-import { wakeAiServer } from './utils/aiAssist';
+import { loadAutoAiRecognition, wakeAiServer } from './utils/aiAssist';
+import { applyRecognizedCoinInfo, requestAiCoinInfo } from './utils/aiCoinRequest';
+import { fullSizePhotoUrl } from './utils/coinPhotoUrls';
 import {
   FREE_COIN_LIMIT,
   StoredProEntitlement,
@@ -144,6 +146,7 @@ export default function App() {
   const [importToast, setImportToast] = useState<string | null>(null);
   const [isFetchingWebhooks, setIsFetchingWebhooks] = useState<boolean>(false);
   const webhookImportRunningRef = useRef(false);
+  const autoAiImportRunningRef = useRef(false);
   const signedInUidRef = useRef<string | null>(null);
   const coinsRef = useRef(coins);
   const foldersRef = useRef(folders);
@@ -1236,6 +1239,61 @@ export default function App() {
     return true;
   };
 
+  const autoRecognizeImportedCoins = async (coinIds: string[]) => {
+    const uid = userUid;
+    if (!uid || autoAiImportRunningRef.current || coinIds.length === 0) return;
+    autoAiImportRunningRef.current = true;
+    let recognized = 0;
+    let failed = 0;
+    let stopMessage: string | null = null;
+    try {
+      for (let index = 0; index < coinIds.length; index++) {
+        if (signedInUidRef.current !== uid) return;
+        const coin = coinsRef.current.find(entry => entry.id === coinIds[index]);
+        if (!coin || (!coin.imageUrl && !coin.reverseImageUrl)) continue;
+        setImportToast(`✨ KI erkennt importierte Münzen: ${index + 1} von ${coinIds.length} …`);
+        try {
+          const res = await requestAiCoinInfo({
+            imageUrl: fullSizePhotoUrl(coin, 'front'),
+            reverseImageUrl: fullSizePhotoUrl(coin, 'back'),
+          });
+          const data = await res.json().catch(() => ({}));
+          if (res.status === 429 || data?.code === 'ai/quota-exceeded') {
+            stopMessage = data?.error || 'Das monatliche KI-Kontingent ist aufgebraucht.';
+            break;
+          }
+          if (!res.ok) {
+            failed++;
+            continue;
+          }
+          if (signedInUidRef.current !== uid) return;
+          const current = coinsRef.current.find(entry => entry.id === coin.id);
+          if (!current) continue;
+          const updated: Coin = { ...applyRecognizedCoinInfo(current, data), updatedAt: new Date().toISOString() };
+          const nextCoins = coinsRef.current.map(entry => entry.id === updated.id ? updated : entry);
+          coinsRef.current = nextCoins;
+          updateCoinsState(nextCoins);
+          recognized++;
+          try {
+            await persistCoinForUser(uid, updated);
+          } catch (error) {
+            console.error('Recognized coin queued for retry:', error);
+          }
+        } catch (error) {
+          console.error('Automatic AI recognition failed:', error);
+          failed++;
+        }
+      }
+      const summary = `✨ KI-Erkennung abgeschlossen: ${recognized} von ${coinIds.length} Münze(n) erkannt.`
+        + (failed > 0 ? ` ${failed} konnte(n) nicht erkannt werden – bitte einzeln öffnen und "KI-Erkennung" klicken.` : '')
+        + (stopMessage ? ` ${stopMessage}` : '');
+      setImportToast(summary);
+      setTimeout(() => setImportToast(null), 12000);
+    } finally {
+      autoAiImportRunningRef.current = false;
+    }
+  };
+
   // Clear All Coins Handler
   const handleClearAllCoins = async () => {
     await preserveIssuedCatalogNumbers(coins);
@@ -1417,9 +1475,13 @@ export default function App() {
         {activeTab === 'backup' && (
           <BackupExportView
             coins={coins}
-            onImportCoins={(newCoins, replaceExisting) => {
+            onImportCoins={(newCoins, replaceExisting, source) => {
               if (!importFitsCoinLimit(newCoins, replaceExisting)) return false;
-              void handleImportCoins(newCoins, replaceExisting);
+              void handleImportCoins(newCoins, replaceExisting).then(imported => {
+                if (imported && source === 'images' && loadAutoAiRecognition()) {
+                  void autoRecognizeImportedCoins(newCoins.map(coin => coin.id));
+                }
+              });
               return true;
             }}
           />

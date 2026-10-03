@@ -5,19 +5,11 @@ import { AutoCoinPreview } from './AutoCoinPreview';
 import { formatSKU } from '../utils/storage';
 import { fullSizePhotoUrl } from '../utils/coinPhotoUrls';
 import { loadAutoAiRecognition, wakeAiServer } from '../utils/aiAssist';
-import { compressDataUrlIfNeeded } from '../utils/firestoreStorage';
+import { aiQuotaNotice, applyRecognizedCoinInfo, requestAiCoinInfo } from '../utils/aiCoinRequest';
 import { WORLD_COUNTRIES, POPULAR_COIN_COUNTRIES } from '../data/countries';
 import { POPULAR_CURRENCIES } from '../data/currencies';
 import { RARITY_OPTIONS } from '../data/rarities';
-import { auth } from '../lib/firebase';
-import {
-  normalizeRecognizedCondition,
-  normalizeRecognizedCurrency,
-  normalizeRecognizedRarity,
-  parseRecognizedValue,
-} from '../utils/aiCoinRecognition';
-
-const AI_COIN_INFO_URL = 'https://inumis-node-backend.onrender.com/api/generate-coin-info';
+import { normalizeRecognizedCurrency } from '../utils/aiCoinRecognition';
 
 // Alle im Dropdown "Material / Legierung" fest hinterlegten Werte.
 const KNOWN_MATERIALS: string[] = [
@@ -28,38 +20,6 @@ const KNOWN_MATERIALS: string[] = [
   'Aluminium', 'Zink', 'Eisen', 'Stahl', 'Zinn', 'Billon', 'Bimetall',
   'Papier', 'Baumwollpapier', 'Polymer', 'Hybrid', 'Keramik', 'Porzellan', 'Holz', 'Unbekannt',
 ];
-
-function aiQuotaNotice(res: Response): string {
-  const remaining = Number(res.headers.get('X-AI-Quota-Remaining'));
-  if (!res.headers.has('X-AI-Quota-Remaining') || !Number.isFinite(remaining)) return '';
-  return remaining === 1
-    ? ' Noch 1 KI-Anfrage in diesem Monat.'
-    : ` Noch ${remaining} KI-Anfragen in diesem Monat.`;
-}
-
-async function requestAiCoinInfo(payload: Record<string, unknown>) {
-  const currentUser = auth.currentUser;
-  if (!currentUser) {
-    throw new Error('Für die KI-Erkennung ist eine Anmeldung erforderlich.');
-  }
-  const idToken = await currentUser.getIdToken();
-  // Kleinere Bilder für die KI: schnellere Übertragung, gleiche Erkennungsqualität.
-  const smallerPayload = { ...payload };
-  for (const key of ['imageUrl', 'reverseImageUrl'] as const) {
-    const value = smallerPayload[key];
-    if (typeof value === 'string' && value.startsWith('data:image/')) {
-      smallerPayload[key] = await compressDataUrlIfNeeded(value, 1024, 0.8, 200 * 1024);
-    }
-  }
-  return fetch(AI_COIN_INFO_URL, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${idToken}`
-    },
-    body: JSON.stringify(smallerPayload)
-  });
-}
 
 interface CoinFormModalProps {
   isOpen: boolean;
@@ -248,28 +208,7 @@ export const CoinFormModal: React.FC<CoinFormModalProps> = ({
         throw new Error(data.error || 'Fehler bei der KI-Generierung');
       }
 
-      const recognizedCondition = normalizeRecognizedCondition(data.condition);
-      const recognizedRarity = normalizeRecognizedRarity(data.rarity);
-      const recognizedValue = parseRecognizedValue(data.currentValue ?? data.estimatedValue);
-      const recognizedCurrency = normalizeRecognizedCurrency(data.currency);
-      setFormData(prev => ({
-        ...prev,
-        name: data.title || prev.name,
-        country: data.country || prev.country,
-        year: (data.year && !isNaN(Number(data.year))) ? Number(data.year) : prev.year,
-        faceValue: data.faceValue || prev.faceValue,
-        currency: recognizedCurrency || prev.currency,
-        material: data.material || prev.material,
-        mintMark: data.mintMark || prev.mintMark,
-        weight: data.weight || prev.weight,
-        diameter: data.diameter || prev.diameter,
-        mintage: data.mintage || prev.mintage,
-        itemType: (data.itemType === 'coin' || data.itemType === 'banknote') ? data.itemType : prev.itemType,
-        condition: recognizedCondition || prev.condition,
-        rarity: recognizedRarity || prev.rarity,
-        currentValue: recognizedValue ?? prev.currentValue,
-        notes: (!prev.notes || prev.notes === 'Keine') && data.description ? data.description : prev.notes
-      }));
+      setFormData(prev => applyRecognizedCoinInfo(prev, data));
       setAiRecognitionNotice(`✨ KI-Erkennung erfolgreich: Seltenheit, Erhaltung, Verkaufswert und Material wurden übernommen.${aiQuotaNotice(res)}`);
       setTimeout(() => setAiRecognitionNotice(null), 12000);
     } catch (err: any) {

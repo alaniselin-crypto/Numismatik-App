@@ -59,7 +59,7 @@ test('the app checks the limit before adding, duplicating and importing coins', 
   assert.match(app, /enforced: isIos/);
   assert.match(app, /const handleSaveCoin = [\s\S]*?if \(!coinData\.id && !ensureRoomForNewCoins\(1\)\) return;/);
   assert.match(app, /const handleDuplicateCoin = async \(sourceCoin: Coin\) => \{\n\s*if \(!ensureRoomForNewCoins\(1\)\) return;/);
-  assert.match(app, /onImportCoins=\{\(newCoins, replaceExisting\) => \{\n\s*if \(!importFitsCoinLimit\(newCoins, replaceExisting\)\) return false;/);
+  assert.match(app, /onImportCoins=\{\(newCoins, replaceExisting, source\) => \{\n\s*if \(!importFitsCoinLimit\(newCoins, replaceExisting\)\) return false;/);
   assert.equal((app.match(/onOpenAddModal=\{openNewCoinForm\}/g) || []).length, 3);
   assert.match(app, /rememberProEntitlement\(entitlement\);[\s\S]*rememberProEntitlement\(entitlement\);/);
   assert.doesNotMatch(app, /setEditCoin\(null\);\n\s*setIsFormModalOpen\(true\);\n\s*\}\}/);
@@ -227,8 +227,8 @@ test('the AI server is woken early and receives smaller pictures', async () => {
   } finally {
     globalThis.fetch = originalFetch;
   }
-  const form = source('src/components/CoinFormModal.tsx');
-  assert.match(form, /compressDataUrlIfNeeded\(value, 1024, 0\.8, 200 \* 1024\)/);
+  assert.match(source('src/utils/aiCoinRequest.ts'), /compressDataUrlIfNeeded\(value, 1024, 0\.8, 200 \* 1024\)/);
+  assert.match(source('src/components/CoinFormModal.tsx'), /from '\.\.\/utils\/aiCoinRequest'/);
   assert.match(source('src/App.tsx'), /if \(userUid\) wakeAiServer\(\);/);
 });
 
@@ -236,4 +236,16 @@ test('the coin form offers all six conditions', () => {
   const form = source('src/components/CoinFormModal.tsx');
   const list = form.slice(form.indexOf('const CONDITION_OPTIONS'), form.indexOf('];', form.indexOf('const CONDITION_OPTIONS')));
   assert.deepEqual([...list.matchAll(/value: '([^']+)'/g)].map(match => match[1]), ['PP', 'stgl', 'vz', 'ss', 's', 'ge']);
+});
+
+test('batch image import runs automatic AI recognition when the setting is on', () => {
+  const app = source('src/App.tsx');
+  const backup = source('src/components/BackupExportView.tsx');
+  assert.match(backup, /onImportCoins\(newCoins, false, 'images'\) === false/);
+  assert.match(backup, /loadAutoAiRecognition\(\)/);
+  assert.match(app, /source === 'images' && loadAutoAiRecognition\(\)/);
+  assert.match(app, /autoRecognizeImportedCoins\(newCoins\.map\(coin => coin\.id\)\)/);
+  assert.match(app, /res\.status === 429 \|\| data\?\.code === 'ai\/quota-exceeded'/);
+  assert.match(app, /applyRecognizedCoinInfo\(current, data\)/);
+  assert.match(source('src/components/CoinFormModal.tsx'), /setFormData\(prev => applyRecognizedCoinInfo\(prev, data\)\)/);
 });

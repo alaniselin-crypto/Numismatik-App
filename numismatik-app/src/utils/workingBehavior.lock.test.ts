@@ -211,9 +211,11 @@ test('the mobile title and AI recognition fields stay configured', () => {
   const server = source('server.ts');
   assert.match(header, /text-base sm:text-xl[\s\S]*Numismatik\.App/);
   assert.match(form, /normalizeRecognizedCurrency/);
-  assert.match(form, /normalizeRecognizedCondition/);
-  assert.match(form, /normalizeRecognizedRarity/);
-  assert.match(form, /parseRecognizedValue/);
+  const recognition = source('src/utils/aiCoinRequest.ts');
+  assert.match(form, /applyRecognizedCoinInfo\(prev, data\)/);
+  assert.match(recognition, /normalizeRecognizedCondition/);
+  assert.match(recognition, /normalizeRecognizedRarity/);
+  assert.match(recognition, /parseRecognizedValue/);
   assert.match(server, /Verkaufswert \(currentValue\)/);
   assert.match(server, /"currentValue": 25/);
   assert.match(server, /\["FR", "FRS", "SFR", "FRANKEN", "SCHWEIZERFRANKEN"\]/);

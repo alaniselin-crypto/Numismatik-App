@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
 import { Download, Upload, RefreshCw, FileSpreadsheet, CheckCircle2, AlertTriangle, ShieldCheck, FileText, ImagePlus } from 'lucide-react';
 import { Coin } from '../types';
+import { loadAutoAiRecognition } from '../utils/aiAssist';
 import { exportCoinsToCSV, downloadCSVFile, parseCSVToCoins, downloadCSVTemplate, parseImageSideAndBaseName } from '../utils/csv';
 
 interface BackupExportViewProps {
   coins: Coin[];
-  onImportCoins: (newCoins: Coin[], replaceExisting: boolean) => boolean | void;
+  onImportCoins: (newCoins: Coin[], replaceExisting: boolean, source?: 'images' | 'csv') => boolean | void;
 }
 
 export const BackupExportView: React.FC<BackupExportViewProps> = ({
@@ -131,12 +132,14 @@ export const BackupExportView: React.FC<BackupExportViewProps> = ({
       });
 
       if (newCoins.length > 0) {
-        if (onImportCoins(newCoins, false) === false) {
+        if (onImportCoins(newCoins, false, 'images') === false) {
           setImportErrors(prev => [...prev, 'Import nicht ausgeführt: Die Gratis-Grenze für Münzen ist erreicht.']);
           return;
         }
         setImportSuccessMsg(
-          `✅ ${newCoins.length} neue Münze(n) importiert${skippedCount > 0 ? ` (${skippedCount} bereits vorhandene übersprungen)` : ''}. Öffnen Sie jede neue Münze und klicken Sie "KI-Erkennung".`
+          `✅ ${newCoins.length} neue Münze(n) importiert${skippedCount > 0 ? ` (${skippedCount} bereits vorhandene übersprungen)` : ''}. ${loadAutoAiRecognition()
+            ? 'Die KI erkennt die Münzen jetzt automatisch nacheinander.'
+            : 'Öffnen Sie jede neue Münze und klicken Sie "KI-Erkennung".'}`
         );
       } else if (skippedCount > 0) {
         setImportSuccessMsg(
