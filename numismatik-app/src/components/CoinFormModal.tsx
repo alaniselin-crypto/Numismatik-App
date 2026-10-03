@@ -76,9 +76,12 @@ interface CoinFormModalProps {
 }
 
 const CONDITION_OPTIONS: { value: CoinCondition; label: string }[] = [
-  { value: 'ss', label: 'SS - Sehr schön' },
-  { value: 'vz', label: 'VZ - Vorzüglich' },
-  { value: 'stgl', label: 'UNZ - Unzirkuliert / Stempelglanz' }
+  { value: 'PP', label: 'PP - Polierte Platte' },
+  { value: 'stgl', label: 'stgl - Stempelglanz' },
+  { value: 'vz', label: 'vz - Vorzüglich' },
+  { value: 'ss', label: 'ss - Sehr schön' },
+  { value: 's', label: 's - Schön' },
+  { value: 'ge', label: 'ge - Gering erhalten' },
 ];
 
 export const CoinFormModal: React.FC<CoinFormModalProps> = ({

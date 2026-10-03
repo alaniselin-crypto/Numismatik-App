@@ -231,3 +231,9 @@ test('the AI server is woken early and receives smaller pictures', async () => {
   assert.match(form, /compressDataUrlIfNeeded\(value, 1024, 0\.8, 200 \* 1024\)/);
   assert.match(source('src/App.tsx'), /if \(userUid\) wakeAiServer\(\);/);
 });
+
+test('the coin form offers all six conditions', () => {
+  const form = source('src/components/CoinFormModal.tsx');
+  const list = form.slice(form.indexOf('const CONDITION_OPTIONS'), form.indexOf('];', form.indexOf('const CONDITION_OPTIONS')));
+  assert.deepEqual([...list.matchAll(/value: '([^']+)'/g)].map(match => match[1]), ['PP', 'stgl', 'vz', 'ss', 's', 'ge']);
+});
