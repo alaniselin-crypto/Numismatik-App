@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Eye, EyeOff, Lock, Mail, ShieldCheck, Sparkles } from 'lucide-react';
 import logoImg from '../assets/logo.png';
-import { useAuth } from '../context/AuthContext';
+import { clearAccountDeletedNotice, hasAccountDeletedNotice, useAuth } from '../context/AuthContext';
 
 function GoogleIcon() {
   return (
@@ -31,7 +31,15 @@ export function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [registerMode, setRegisterMode] = useState(false);
   const [busy, setBusy] = useState<'google' | 'email' | 'reset' | null>(null);
-  const [message, setMessage] = useState<{ type: 'error' | 'success'; text: string } | null>(null);
+  const [message, setMessage] = useState<{ type: 'error' | 'success'; text: string } | null>(() => (
+    hasAccountDeletedNotice()
+      ? { type: 'success', text: 'Ihr Konto, Ihre Sammlung und alle Fotos wurden dauerhaft gelöscht.' }
+      : null
+  ));
+
+  useEffect(() => {
+    clearAccountDeletedNotice();
+  }, []);
 
   const submitEmail = async (event: React.FormEvent) => {
     event.preventDefault();

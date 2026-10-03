@@ -24,6 +24,33 @@ import { deleteAllUserDataFromFirestore } from '../utils/firestoreStorage';
 import { persistAccountDeletionDiagnostic } from '../utils/accountDeletionDiagnostic';
 import { resolveAccountDeletionProvider } from '../utils/accountDeletionProvider';
 
+const ACCOUNT_DELETED_KEY = 'numismatik_account_deleted_notice';
+
+function rememberAccountDeleted(): void {
+  try {
+    sessionStorage.setItem(ACCOUNT_DELETED_KEY, '1');
+  } catch {
+    /* ignore */
+  }
+}
+
+/** true, wenn gerade ein Konto gelöscht wurde (für die Bestätigung auf der Anmeldeseite). */
+export function hasAccountDeletedNotice(): boolean {
+  try {
+    return sessionStorage.getItem(ACCOUNT_DELETED_KEY) === '1';
+  } catch {
+    return false;
+  }
+}
+
+export function clearAccountDeletedNotice(): void {
+  try {
+    sessionStorage.removeItem(ACCOUNT_DELETED_KEY);
+  } catch {
+    /* ignore */
+  }
+}
+
 
 export interface AppUser {
   uid: string;
@@ -298,6 +325,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         'Render Apple account deletion',
         () => deleteTestAppleAccountOnServer(freshFirebaseIdToken, authorizationCode),
       );
+      rememberAccountDeleted();
       await signOut(auth);
       return;
     }
@@ -327,6 +355,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         () => deleteUser(userToDelete),
       );
     }
+    rememberAccountDeleted();
     await signOut(auth);
 
 

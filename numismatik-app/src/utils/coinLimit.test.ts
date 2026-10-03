@@ -180,3 +180,11 @@ test('AI success messages appear right next to their buttons on the phone', () =
   assert.ok(notesButton > 0 && notesNotice > notesButton && notesNotice - notesButton < 2500);
   assert.equal(form.includes('KI Banner Notification'), false);
 });
+
+test('after deleting the account the login page confirms the deletion', () => {
+  const authContext = source('src/context/AuthContext.tsx');
+  assert.equal((authContext.match(/rememberAccountDeleted\(\);\n\s*await signOut\(auth\);/g) || []).length, 2);
+  const login = source('src/components/LoginPage.tsx');
+  assert.match(login, /hasAccountDeletedNotice\(\)\n\s*\? \{ type: 'success', text: 'Ihr Konto, Ihre Sammlung und alle Fotos wurden dauerhaft gelöscht\.' \}/);
+  assert.match(login, /useEffect\(\(\) => \{\n\s*clearAccountDeletedNotice\(\);\n\s*\}, \[\]\);/);
+});
